@@ -60,4 +60,4 @@ kubectl get po -l '!env'
 kubectl describe po podname 
 ```
 得到结果如下
-![容器上次崩溃的原因：错误码137](../images/企业微信截图_15773468618763.png)
+![容器上次崩溃的原因：错误码137](../images/企业微信截图_15773468618763.png)  
