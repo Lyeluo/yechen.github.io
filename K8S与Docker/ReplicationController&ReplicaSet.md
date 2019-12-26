@@ -96,6 +96,7 @@ spec:
 + Notln : Label的值与任何指定的values不匹配。 
 + Exists : pod必须包含一个指定名称的标签（值不重要）。使用此运算符时， 不应指定values字段。  
 + DoesNotExist : pod不得包含有指定名称的标签。values属性不得指定  
+
 如果你指定了多个表达式，则所有这些表达式都必须为true才能使选择器与 pod匹配。如果同时指定matchLabels和matchExpressions, 则所有标签都必须匹配，并且所有表达式必须计算为true以使该pod与选择器匹配    
 
 3 . 删除Rs
