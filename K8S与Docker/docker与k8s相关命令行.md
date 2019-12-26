@@ -47,3 +47,17 @@ kubectl logs podname
 pod中多容器
 kubectl logs podname -c contaionername
 ```
++ 根据标签查询pod  
+```
+查询包含env标签的pod
+kubectl get po -l env
+查询不包含env标签的pod
+kubectl get po -l '!env'
+题外话：标签可以被附加给任何kubernetes的对象上，包括node
+```
++ 查看重启容器后的pod描述
+```
+kubectl describe po podname 
+```
+得到结果如下
+![容器上次崩溃的原因：错误码137](../images/企业微信截图_15773468618763.png)
