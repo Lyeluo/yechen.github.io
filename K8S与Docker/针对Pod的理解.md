@@ -12,4 +12,80 @@ k8s中的思想是：每个容器只安装一个进程，然后多个或一个�
 ## 何时在pod使用多个容器  
 + 一般情况下建议单容器pod
 + 多容器需要同时扩缩容，是否必须一起运行，代表的是一个主体还是多个独立的组件  
+## 只运行一次的Pod-Job
+Job是一种特殊的Pod，只会执行一次，执行完毕之后就会进入已完成状态，之所以不会删除是为了查看日志  
+1. 创建脚本
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: batch-job
+spec:
+  # 执行最大时间，超时则停止执行 并标记失败
+  activeDeadlineSeconds: 30
+  # 最多重试次数，默认为6
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app: batch-job
+    spec:
+      # job的重启策略不能使用默认的Always
+      restartPolicy: OnFailure
+      containers:
+        - name: main
+          image: batch-job/1.0
+```  
+Job可以创建多个pod，通过配置使他们串行执行或者并行执行  
 
+2. 串行执行多个,配置completions参数
+```yaml
+spec:
+  # 执行最大时间，超时则停止执行 并标记失败
+  activeDeadlineSeconds: 30
+  # 最多重试次数，默认为6
+  backoffLimit: 3
+  completions: 5
+  template:
+    metadata:
+      labels:
+        app: batch-job
+```
+3. 并行执行多个，配置parallelism参数，表示最多可以几个pod并行执行  
+```yaml
+spec:
+  # 执行最大时间，超时则停止执行 并标记失败
+  activeDeadlineSeconds: 30
+  # 最多重试次数，默认为6
+  backoffLimit: 3
+  completions: 5
+  parallelism: 2
+  template:
+    metadata:
+      labels:
+        app: batch-job
+```
+4. 定时执行的job
+```yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: batch-job-cron
+spec:
+  # cron表达式
+  schedule: "0,15,30,45 * * * *"
+  # pod必须在预定时间15s后执行，否则判定为执行失败
+  startingDeadlineSeconds: 15
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: batch-job-cron
+        spec:
+          # job的重启策略不能使用默认的Always
+          restartPolicy: OnFailure
+          containers:
+            - name: main
+              image: batch-job/1.0
+```
