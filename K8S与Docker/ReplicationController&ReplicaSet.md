@@ -46,7 +46,7 @@ spec:
 2 . ReplicationController（Rc）会根据标签选择器管理符合其标签的所有pod，并维持在replicas设置的数量上。  
  当有一个pod发生故障然后又需要保留pod以查询日志信息的时候，可以更改pod的标签来移出ReplicationController的管理范围，
 这样Rc会重新创建一个pod，故障pod也不会删除，仍然可以根据日志分析故障原因    
-3 . 注意：修改yaml文件的模板或者标签选择器时，要删除之前创建的pod，不然pod会失去Rc的管理，白白占用内存空间，类似于java中的内存泄漏
+3 . 注意：修改yaml文件的模板或者标签选择器时，要删除之前创建的pod，不然pod会失去Rc的管理，白白占用内存空间，类似于java中的内存泄漏  
 4 . 直接编辑Rc的yaml命令,命令执行后会自动生效，可以用来升级pod，但是后面有更好的方法
 ```
 kubectl edit rc myapp  
@@ -82,7 +82,7 @@ spec:
             - containerPort: 8080
 ```
 2 . 更加强大的标签选择器：matchExpressions   
-![matchExpressions标签匹配的规则](../images/1577351639(1).jpg)
+![matchExpressions标签匹配的规则](../images/1577351639(1).jpg)  
 3 . 删除rs及下属pod
 ```bash
 kubectl delete re kubia
