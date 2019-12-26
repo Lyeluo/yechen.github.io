@@ -82,8 +82,23 @@ spec:
             - containerPort: 8080
 ```
 2 . 更加强大的标签选择器：matchExpressions   
-![matchExpressions标签匹配的规则](../images/1577351639(1).jpg)  
-3 . 删除rs及下属pod
+```yaml
+spec:
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - app
+```
+每个表达式都必须包含一个key、一 个operator(运算符），并且可能还有一个values的列表（取决于运算符），运算符如下：   
++ In : Label的值必须与其中一个指定的values匹配。  
++ Notln : Label的值与任何指定的values不匹配。 
++ Exists : pod必须包含一个指定名称的标签（值不重要）。使用此运算符时， 不应指定values字段。  
++ DoesNotExist : pod不得包含有指定名称的标签。values属性不得指定  
+如果你指定了多个表达式，则所有这些表达式都必须为true才能使选择器与 pod匹配。如果同时指定matchLabels和matchExpressions, 则所有标签都必须匹配，并且所有表达式必须计算为true以使该pod与选择器匹配    
+
+3 . 删除Rs
 ```bash
-kubectl delete re kubia
+kubectl delete rs kubia
 ```
