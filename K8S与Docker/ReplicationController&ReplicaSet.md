@@ -1,4 +1,4 @@
-## ReplicationController & Deployment
+## ReplicationController
 ### 存活探针
 Kubemetes有以下三种探测容器的机制： 
 + HTTPGET探针对容器的IP地址（你指定的端口和路径）执行HTTPGET请求，如果探测器收到响应，并且响应状态码不代表错误（换句话说，如果HTTP 响应状态码是2xx或3xx), 则认为探测成功。  
