@@ -82,7 +82,7 @@ spec:
     app: app
 ```
 原理图如下：  
-![nodePort类型原理图](../images/1577430534(1).jpg)
+![nodePort类型原理图](../images/1577430534(1).jpg)  
 2. LoadBalance  
 如果是使用云服务器商提供的kubernetes，会提供一个负载平衡器，负载平衡器有自己的固定ip。在普通的NodePort类型的service上，访问任一节点上的端口
 会由node节点将请求转发给service，然后service再根据匹配规则随机将请求转发到任一节点的pod上。    
@@ -90,7 +90,7 @@ spec:
 但是，负责均衡器则不同，其的位置在node的前面，即便节点挂掉了，也会将请求转发到其他节点上。  
 而且相对于nodeport，这种方式不需要关闭k8s的防火墙  
 原理图如下：  
-![LoadBalance类型原理图](../images/1577430834(1).jpg)
+![LoadBalance类型原理图](../images/1577430834(1).jpg)  
 3. 外部链接的特性
 + 可以通过配置spec来指定，接收链接的pod所在的节点必须是访问链接时的ip对应的节点，如果该节点不存在pod，则挂起链接
 ```yaml
