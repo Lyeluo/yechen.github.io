@@ -61,3 +61,13 @@ kubectl describe po podname
 ```
 得到结果如下
 ![容器上次崩溃的原因：错误码137](../images/企业微信截图_15773468618763.png)  
+
+###
++ 在pod中执行一个sh命令
+```bash
+kubectl exec kubia-7nogl -- curl -s http: //10 .111. 249 .153
+```
++ 在pod中执行shell脚本
+```bash
+kubectl exec -it kubia-3inly bash
+```

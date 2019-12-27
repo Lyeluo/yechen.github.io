@@ -14,11 +14,16 @@ spec:
       image: WAREHOUSE/NAMESPACE/IMAGE_NAME:TAG
       # 一个基于HTTP GET的存活探针
       livenessProbe:
+         # 每隔三秒检测一下
+        periodSeconds: 3
         # 第一次检测在容器启动15秒后
         initialDelaySeconds: 15
         httpGet:
           port: 8080
           path: /
+          httpHeaders:
+             - name: X-Custom-Header
+               value: Awesome
 ```
 ## ReplicationController
 1. 创建ReplicationController的yaml
@@ -104,4 +109,4 @@ spec:
 kubectl delete rs kubia
 ```  
 
-4 . 注意：更改yaml的模板对现有pod不会产生影响，但是更改标签选择器会立即生效，如果当前标签没有符合更改后的标签选择器,rs或rc会立即创建pod，保持设置的数量  
+4 . 注意：更改yaml的模板对现有pod不会产生影响，但是更改标签选择器会立即生效，如果当前标签没有符合更改后的标签选择器、或数量少于设置实例数量，rs或rc会立即创建pod，保持设置的数量  
