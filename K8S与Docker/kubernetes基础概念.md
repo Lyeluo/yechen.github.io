@@ -42,3 +42,5 @@ kubectl label node nodename disk=ssd
 ```bash
 kubectl label node nodename disk=hdd --overwrite 
 ``` 
+## Kuberbetes服务
+[针对k8s服务的理解](k8s服务.md)  
