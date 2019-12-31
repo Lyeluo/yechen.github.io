@@ -55,6 +55,24 @@ backend-database.default.svc.cluster.local
 + backend-database:服务名称
 + default：命名空间名称
 + svc.cluster.local 集群域名称
+## 为外部服务创建别名
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: yechen-service
+spec:
+  type: ExternalName
+  # 外部服务的域名
+  externalName: yechen.example.com
+  ports:
+    - port: 80
+
+```
+externalName不支持ip的写法，只支持域名。而且这种方式不需要配置标签选择器，而且是将服务名称为yechen-service映射到yechen.example.com上，
+这样的话不会暴露服务调用的地址，或者这个地址被谁调用  
+
+还有没有其他应用场景暂时不清楚
 ## 暴露服务给外部客户端
 + 将服务的类型设置成NodePort-每个集群节点都会在节点上打 开 一个端口， 对于NodePort服务， 每个集群节点在节点本身（因此得名叫
 NodePort)上打开一个端口，并将在该端口上接收到的流量重定向到基础服务。该服务仅在内部集群 IP 和端口上才可访间， 但也可通过所有节点上的专用端
