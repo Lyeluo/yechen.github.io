@@ -145,4 +145,7 @@ kubectl create configmap my-config
 主动刷新。
 
 如果挂载的是容器中的单个文件而不是整个卷，那么configmap更新后对应的文件不会被更新（不确定目前最新版本是否还是这样）  
-
+## 使用 Secret给容器传递敏感数据
+Secret的使用方法与configmap相同，不过Secret只会被分发到需要访问Secret的pod所在的机器节点上，而且只会存储在内存中。  
++ 采用 ConfigMap 存储非敏感的文本配置数据。
++ 采用 Secret 存储天生敏感的数据，通过键来引用。 如果一个配置文件同时包含敏感与非敏感数据， 该文件应该被存储在 Secret 中
