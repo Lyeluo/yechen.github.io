@@ -149,3 +149,50 @@ kubectl create configmap my-config
 Secret的使用方法与configmap相同，不过Secret只会被分发到需要访问Secret的pod所在的机器节点上，而且只会存储在内存中。  
 + 采用 ConfigMap 存储非敏感的文本配置数据。
 + 采用 Secret 存储天生敏感的数据，通过键来引用。 如果一个配置文件同时包含敏感与非敏感数据， 该文件应该被存储在 Secret 中
+1. 创建secret  
+`kubectl create secret generic fortune-https --from-file=https.key`  
+创建方式与configmap基本相同，这里是创建了一个generic的Secret
+
+2. secret与configmap的区别  
+secret以Base64的格式来存储文本信息；configmap以文本格式存储文本信息。这样的话对于yaml或者json格式的文件，在使用kubectl命令展示secret的时候就需要
+进行转义，而且secret存储文本信息的大小为1MB。
+  
+备注：在使用pod读取secret时，不需要进行转义，可以直接使用。  
+3. kubernetes允许secret使用纯文本值。可以通过StringData字段实现。
+4. 在pod中使用secret
+```yaml
+    spec:
+      containers:
+        - name: app
+          image: app/1.0
+          volumeMounts:
+            - mountPath: /etc/someconfig.conf
+              name: certs
+              subPath: myconfig.conf
+              readOnly: true
+          ports:
+            - containerPort: 8080
+      volumes:
+        - name: certs
+          secret:
+            secretName: nainx-config
+```
+与configmap一样secret也支持在挂载的同时对文件赋予文件权限。  
+5. 使用secret创建环境变量。  
+因为环境变量的方式并不安全，可以有很多种方式被获取，所以这里就不介绍了。
+6.  docker hub私有仓库配置secret  
+   1. 创建docker-registry类型的secret`kubectl create secret docker-registry mydockerhubsecret --docker-username=root --docker-password=root --docker-email=yechen@yuanian.com`
+   2. 配置pod，这样的话在私有仓库拉取代码的时候，会自动进行登陆。后面会有更好的办法，所以不需要为每一个pod创建secret
+   ```yaml
+        spec:
+          imagePullSecrets:
+            - name: mydockerhubsecret
+          containers:
+            - name: app
+              image: app/1.0
+              ports:
+                - containerPort: 8080
+    ```
+   
+ 
+
