@@ -149,6 +149,7 @@ kubectl create configmap my-config
 Secret的使用方法与configmap相同，不过Secret只会被分发到需要访问Secret的pod所在的机器节点上，而且只会存储在内存中。  
 + 采用 ConfigMap 存储非敏感的文本配置数据。
 + 采用 Secret 存储天生敏感的数据，通过键来引用。 如果一个配置文件同时包含敏感与非敏感数据， 该文件应该被存储在 Secret 中
+
 1. 创建secret  
 `kubectl create secret generic fortune-https --from-file=https.key`  
 创建方式与configmap基本相同，这里是创建了一个generic的Secret

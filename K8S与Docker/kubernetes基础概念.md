@@ -46,3 +46,6 @@ kubectl label node nodename disk=hdd --overwrite
 [针对k8s服务的理解](k8s服务.md)  
 ## 挂载容器到磁盘
 [挂载卷](挂载卷.md)
+## 通过外部程序获得kubernetes元数据
+[pod元数据](pod元数据.md)  
+## Deployment
