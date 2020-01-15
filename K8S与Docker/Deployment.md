@@ -76,7 +76,9 @@ kubectl rollout resume deployment kubia
 ```
 因为修改Deployment时会自动触发滚动升级，如果不想立即升级，可以通过不停的使用暂停滚动升级，直到对deployment的修改完毕后，再恢复滚动升级。  
 ### 阻止出错版本的滚动升级
-可以通过Deployment的minReadySeconds和就绪探针实现，升级过程中发现新版本故障，自动停止升级。  
+可以通过Deployment的spec.minReadySeconds和就绪探针实现，升级过程中发现新版本故障，自动停止升级。
+  
+minReadySeconds指的是，新创建的pod至少要成功运行多久之后 ，才能将其视为可用，在这个期间内，deployment不会继续滚动升级，除非这个pod已经被视为可用。  
 
 在升级过程中，pod的就绪探针返回成功后，kubernetes才会视为pod可用，而在deployment升级过程中只有在minReadySeconds时间内，
 pod的就绪探针没有返回过失败，才会判断为这个新版本pod发布没有问题，然后继续后面的滚动升级动作，否则会阻止滚动升级。
