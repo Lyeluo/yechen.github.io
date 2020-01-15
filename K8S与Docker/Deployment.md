@@ -58,7 +58,7 @@ spec:
       maxSurge: 1
     # 决定了在升级过程中，最多允许多少个pod处于不可用状态，默认为25%
     # 如果期待数量为4，那么可用的pod数量最低为3
-    # 如果设置的不是百分数的化，则代表的允许的最大不可用数量，下面这个就是指最大不可用数为一个
+    # 如果设置的不是百分数的化，则代表的允许的最大不可用数量，下面这个就是指最大不可用数为0
       maxUnavailable: 0
 ```
 2. 暂停滚动升级  
@@ -81,6 +81,6 @@ kubectl rollout resume deployment kubia
 minReadySeconds指的是，新创建的pod至少要成功运行多久之后 ，才能将其视为可用，在这个期间内，deployment不会继续滚动升级，除非这个pod已经被视为可用。  
 
 在升级过程中，pod的就绪探针返回成功后，kubernetes才会视为pod可用，而在deployment升级过程中只有在minReadySeconds时间内，
-pod的就绪探针没有返回过失败，才会判断为这个新版本pod发布没有问题，然后继续后面的滚动升级动作，否则会阻止滚动升级。
+pod的就绪探针没有失败，才会判断为这个新版本pod发布没有问题，然后继续后面的滚动升级动作，否则会阻止滚动升级。
 
 可以通过设置Deployment的spec.progressDeadlineSeconds值来定义升级的时间限制，如果在设置时间内没有完成升级，则会停止升级动作。
