@@ -160,12 +160,20 @@ Ingress也支持HTTPS，具体方法可以参考《kubernetes 实战》149页内
         - name: app
           image: app/1.0
           readinessProbe:
+            # 每1秒调用一次
+            periodSeconds: 1
             httpGet:
               port: 8080
               path: /healthz
           ports:
             - containerPort: 8080
 ```
+readinessProbe详细的配置:
++ initialDelaySeconds：容器启动后第一次执行探测是需要等待多少秒。
++ periodSeconds：执行探测的频率。默认是10秒，最小1秒。
++ timeoutSeconds：探测超时时间。默认1秒，最小1秒。
++ successThreshold：探测失败后，最少连续探测成功多少次才被认定为成功。默认是1。对于liveness必须是1。最小值是1。
++ failureThreshold：探测成功后，最少连续探测失败多少次才被认定为失败。默认是3。最小值是1。
 + 务必定义就绪探针
 ## Headless
 是一种特殊的Service，通过DNS轮询机制来实现pod的负载均衡，而不是服务代理。由服务返回给用户真正的podIp，然后用户直接调用这个podIp，
