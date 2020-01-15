@@ -64,6 +64,7 @@ spec:
 2. 暂停滚动升级  
 将一个Deployment创建几秒后，暂停该Deployment，这样的话会创建一个新的pod，同时旧的pod依然在运行。
 这就是所谓的金丝雀发布，可以用来验证新版本的运行使用情况。验证完毕后可以继续升级或回滚旧版本。  
+
 目前还无法实现在一个确定的位置暂定滚动升级以达到金丝雀发布，所以上述方法还不健全。
 可以操作的是可以创建两个不同的deployment，然后通过其pod数量来实现金丝雀发布
 ```yaml
@@ -76,6 +77,8 @@ kubectl rollout resume deployment kubia
 因为修改Deployment时会自动触发滚动升级，如果不想立即升级，可以通过不停的使用暂停滚动升级，直到对deployment的修改完毕后，再恢复滚动升级。  
 ### 阻止出错版本的滚动升级
 可以通过Deployment的minReadySeconds和就绪探针实现，升级过程中发现新版本故障，自动停止升级。  
+
 在升级过程中，pod的就绪探针返回成功后，kubernetes才会视为pod可用，而在deployment升级过程中只有在minReadySeconds时间内，
 pod的就绪探针没有返回过失败，才会判断为这个新版本pod发布没有问题，然后继续后面的滚动升级动作，否则会阻止滚动升级。
+
 可以通过设置Deployment的spec.progressDeadlineSeconds值来定义升级的时间限制，如果在设置时间内没有完成升级，则会停止升级动作。
