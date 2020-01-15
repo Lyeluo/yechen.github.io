@@ -27,4 +27,5 @@ kubectl patch命令会更改Deployment的自由属性，并不会导致pod的更
 | kubectl apply | 通过一个完整的yaml或json文件来修改资源，如果文件中定义的资源不存在，会创建一个。文件中对资源的描述必须全面，不能像patch那样 | kubectl apply -f kubia-deploy.yaml | 
 | kubectl replace | 将原有对象替换为yaml/json中定义的新对象。如果原有对象不存在，会报错 | kubectl replace -f kubia-deploy.yaml | 
 | kubectl set image | 修改pod、rs、rc、deployment、DemonSet、job中的镜像 | kubectl set image deployment kubia nodejs=luksa/kubia:v2 |   
+
 以上这些方式修改完Deployment资源后，会自动触发滚动升级
