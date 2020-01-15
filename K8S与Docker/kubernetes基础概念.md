@@ -49,3 +49,4 @@ kubectl label node nodename disk=hdd --overwrite
 ## 通过外部程序获得kubernetes元数据
 [pod元数据](pod元数据.md)  
 ## Deployment
+[Deployment](Deployment.md)
