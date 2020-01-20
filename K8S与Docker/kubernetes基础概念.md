@@ -50,3 +50,5 @@ kubectl label node nodename disk=hdd --overwrite
 [pod元数据](pod元数据.md)  
 ## Deployment
 [Deployment](Deployment.md)
+## Statefulset
+[Statefulset](Statefulset.md)

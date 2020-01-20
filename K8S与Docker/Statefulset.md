@@ -71,7 +71,8 @@ Statefulset创建pod的方式与ReplicaSet或ReplicationController不同，他�
 ## Statefulset节点丢失处理方法
 如果在Statefulset运行期间，下属的有一个pod所在的节点挂掉了，或者丢失了节点的信息。在集群其他机器查询时会发现pod的状态会变为Terminating，
 但是kubernetes已经失去了对这个节点的控制，所以当他想要通知这个pod所在的节点删除pod进而重新部署pod时，会失败。那么这个pod就挂在了kubernetes上面，但是实际上上一个无效的pod。  
-注意：这个pod里的容器不一定是挂掉的，这要取决于这个pod所在节点是挂掉了还是仅仅失去了与kubernetes的关联，总的来说kubernetes只是对pod失去了控制。  
+
+注意：这个pod里的容器不一定是挂掉的，这要取决于这个pod所在节点是挂掉了还是仅仅失去了与kubernetes的关联，总的来说kubernetes只是对节点失去了控制。  
 
 #### 解决方法
 需要删除掉pod然后让StatefulSet重新部署，此时使用普通的删除节点的方式`kubectl delete po kubia-0`，是无法生效的，因为在kubernetes看来这个pod已经删除了，
