@@ -25,6 +25,10 @@ docker cp 7ec8d55dcc43:/usr/local/tomcat/bin/catalina.sh ./catalina.sh
 /usr/local/tomcat/bin/catalina.sh：容器中文件的全路径
 ./catalina.sh：宿主机文件的相对路径
 ```
+6.查看日志
+```bash
+docker logs --tail=100 -f 容器id 
+```
 ## K8S命令
 + 查看一个pod的信息，以yaml/json格式展示
 ```
