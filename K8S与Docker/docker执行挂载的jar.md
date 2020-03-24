@@ -14,4 +14,17 @@ docker run -d -p 9001:8081 -v /opt/springboot-docker-1.0.jar:/var/lib/docker/jar
 # java -jar /var/lib/docker/jar/springboot-docker-1.0.jar
 # 表示运行jar包，注意：这里的jar包为容器中的位置，是通过前面的-v属性映射的
 ~~~
+## 完整的脚本
+~~~bash
+#!/usr/bin/env bash
+docker pull openjdk:8
+#判断容器是否存在
+docker ps -a | grep ecs-console &> /dev/null
+if [ $? -ne 0 ]; then
+    docker run -d -p 9001:8081 -v /home/docker/ecs/timezone:/etc/timezone -v /etc/localtime:/etc/localtime -v /home/docker/ecs/console/ecs-console.jar:/ecs-console.jar --name ecs-console openjdk:8 java -Xmx1024m -Xms1024m -XX:MaxMetaspaceSize=256M -XX:MetaspaceSize=256M -Dfile.encoding=utf-8 -jar /ecs-console.jar
+else
+   docker restart ecs-console
+fi
+
+~~~
 
