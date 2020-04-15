@@ -1,3 +1,4 @@
+[[toc]]
 ## 下载镜像
 docker pull openjdk:8
 ## 执行命令

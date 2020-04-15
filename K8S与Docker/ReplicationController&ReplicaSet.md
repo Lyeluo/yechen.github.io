@@ -1,3 +1,4 @@
+[[toc]]
 ## ReplicationController
 ### 存活探针
 Kubemetes有以下三种探测容器的机制： 

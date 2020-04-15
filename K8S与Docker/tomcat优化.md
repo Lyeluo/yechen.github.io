@@ -1,3 +1,4 @@
+[[toc]]
 1.随机数生成器耗时高问题
 ```
 打开$JAVA_PATH/jre/lib/security/java.security这个文件

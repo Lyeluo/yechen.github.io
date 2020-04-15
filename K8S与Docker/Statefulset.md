@@ -1,3 +1,4 @@
+[[toc]]
 ## Statefulset
 Statefulset与ReplicaSet/ReplicationController的区别：
 + ReplicaSet/ReplicationController就好比牧场中的牛，死掉一个然后补上一个，牧场主不会发觉有什么改变。
