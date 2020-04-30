@@ -2,6 +2,32 @@
 ## Docker命令
 1.删除悬空镜像（镜像名称或者tag为空的镜像）  
 ```docker rmi $(docker images -f "dangling=true" -q)```  
+清理所有无用镜像.这招要慎用，否则需要重新下载。      
+```bash
+docker image prune -a
+#可以增加过滤条件，如根据创建时间删除
+docker image prune -a --force --filter "until=312h"
+```
+7. 清理已经退出的容器
+```bash
+docker container prune --force
+```
+根据容器名称匹配停止容器，删除容器
+```bash
+docker stop  `docker ps -aq --filter image=harbor*`
+docker rm    `docker ps -aq --filter name=harbor*`
+```
+根据镜像名称匹配停止容器，删除容器
+```bash
+# 这里好像不能用通配符
+docker stop  `docker ps -aq --filter ancestor=rancher/rancher-agent:v2.4.2`
+docker rm    `docker ps -aq --filter ancestor=rancher/rancher-agent:v2.4.2`
+```
+根据名称匹配删除镜像
+```bash
+docker image rm `docker images -q --filter reference=vmware/harbor*`
+
+```
 2.进入容器
 ```
 docker exec -it 容器id /bin/bash
@@ -30,6 +56,12 @@ docker cp 7ec8d55dcc43:/usr/local/tomcat/bin/catalina.sh ./catalina.sh
 ```bash
 docker logs --tail=100 -f 容器id 
 ```
+
+8. 过滤查询容器
+```bash
+docker ps -a --filter 'exited=0'
+```
+更多docker命令查看地址：https://docs.docker.com/engine/reference/commandline/image_prune/#filtering
 ## K8S命令
 + 查看一个pod的信息，以yaml/json格式展示
 ```
