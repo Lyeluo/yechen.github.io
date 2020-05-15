@@ -2,7 +2,23 @@
 ## Docker命令
 1.删除悬空镜像（镜像名称或者tag为空的镜像）  
 ```docker rmi $(docker images -f "dangling=true" -q)```  
-清理所有无用镜像.这招要慎用，否则需要重新下载。      
+docker启停
+```bash
+#启动docker
+service docker start
+#停止docker
+service docker stop
+#重启docker
+service docker restart
+systemctl enable docker
+```
+docker 配置login harbor
+```bash
+vim /usr/lib/systemd/system/docker.service
+
+```
+
+清理所有无用镜像.这招要慎用，否则需要重新下载。  
 ```bash
 docker image prune -a
 #可以增加过滤条件，如根据创建时间删除
@@ -15,17 +31,17 @@ docker container prune --force
 根据容器名称匹配停止容器，删除容器
 ```bash
 docker stop  `docker ps -aq --filter image=harbor*`
-docker rm    `docker ps -aq --filter name=harbor*`
+docker rm    `docker ps -aq --filter name=zabbix*`
 ```
 根据镜像名称匹配停止容器，删除容器
 ```bash
 # 这里好像不能用通配符
 docker stop  `docker ps -aq --filter ancestor=rancher/rancher-agent:v2.4.2`
-docker rm    `docker ps -aq --filter ancestor=rancher/rancher-agent:v2.4.2`
+docker rm    `docker ps -aq --filter ancestor=rancher/rke-tools:v0.1.56` -f
 ```
 根据名称匹配删除镜像
 ```bash
-docker image rm `docker images -q --filter reference=vmware/harbor*`
+docker image rm `docker images -q --filter reference=zabbix/zabbix*`
 
 ```
 2.进入容器
