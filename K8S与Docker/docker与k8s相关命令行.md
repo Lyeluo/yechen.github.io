@@ -31,7 +31,7 @@ docker container prune --force
 根据容器名称匹配停止容器，删除容器
 ```bash
 docker stop  `docker ps -aq --filter image=harbor*`
-docker rm    `docker ps -aq --filter name=zabbix*`
+docker rm    `docker ps -aq --filter name=rmq*`
 ```
 根据镜像名称匹配停止容器，删除容器
 ```bash
@@ -79,6 +79,10 @@ docker ps -a --filter 'exited=0'
 ```
 更多docker命令查看地址：https://docs.docker.com/engine/reference/commandline/image_prune/#filtering
 ## K8S命令
++ 查看节点信息 带标签
+```bash
+rancher kubectl get nodes --show-labels
+```
 + 查看一个pod的信息，以yaml/json格式展示
 ```
  kubectl get po kubia-zxzij -o yaml 
@@ -114,7 +118,11 @@ kubectl describe po podname
 ```
 得到结果如下
 ![容器上次崩溃的原因：错误码137](../images/企业微信截图_15773468618763.png)  
++ 增加node标签,配合deploy.yml里的nodeSelector属性使用
+```bash
+rancher kubectl label nodes dockercontainermaster businesstype=ecs
 
+```
 ###
 + 在pod中执行一个sh命令
 ```bash

@@ -58,3 +58,20 @@ curl -XDELETE 'http://192.168.2.186:9200/索引名称（可用通配符）'
 kubectl logs podName --previous
 
 ```
+## kafka
+```bash
+#启动zookeeper
+bin/zookeeper-server-start.sh config/zookeeper.properties
+bin/zookeeper-server-stop.sh config/zookeeper.properties
+#启动停止kafka
+bin/kafka-server-start.sh config/server.properties
+bin/kafka-server-stop.sh config/server.properties
+#查看当前Kafka集群中Topic的情况
+bin/kafka-topics.sh --list --zookeeper ecsdocker183,ecsdocker184,ecsdocker185
+#查看Topic的分区和副本情况
+bin/kafka-topics.sh --describe --zookeeper ecsdocker183,ecsdocker184,ecsdocker185  --topic ms-job-console
+#测试发送消息
+sh kafka-console-producer.sh --broker-list localhost:9092 --topic test
+#测试消费消息
+sh kafka-console-consumer.sh --zookeeper 192.168.2.183:2181,192.168.2.184:2181,192.168.2.185:2181 --topic test --from-beginning
+```
