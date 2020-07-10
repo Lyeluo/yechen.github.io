@@ -85,3 +85,7 @@ minReadySeconds指的是，新创建的pod至少要成功运行多久之后 ，�
 pod的就绪探针没有失败，才会判断为这个新版本pod发布没有问题，然后继续后面的滚动升级动作，否则会阻止滚动升级。
 
 可以通过设置Deployment的spec.progressDeadlineSeconds值来定义升级的时间限制，如果在设置时间内没有完成升级，则会停止升级动作。
+## Deployment的创建过程
+准备包含Deployment清单的YAML文件， 通过kubectl提交到Kubernetes。kubectl通过HTTP POST请求发送清单到Kubernetes API服务器。 API服务器检
+查Deployment定义，存储到etcd, 返回响应给kubect。
+![Deployment的创建过程](../images/1594087745(1).jpg)
