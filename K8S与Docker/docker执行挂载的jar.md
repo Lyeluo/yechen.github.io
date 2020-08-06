@@ -1,4 +1,3 @@
-[[toc]]
 ## 下载镜像
 docker pull openjdk:8
 ## 执行命令
@@ -22,7 +21,7 @@ docker pull openjdk:8
 #判断容器是否存在
 docker ps -a | grep ecs-console &> /dev/null
 if [ $? -ne 0 ]; then
-    docker run -d -p 9001:8081 -v /home/docker/ecs/timezone:/etc/timezone -v /etc/localtime:/etc/localtime -v /home/docker/ecs/console/ecs-console.jar:/ecs-console.jar --name ecs-console openjdk:8 java -Xmx1024m -Xms1024m -XX:MaxMetaspaceSize=256M -XX:MetaspaceSize=256M -Dfile.encoding=utf-8 -jar /ecs-console.jar
+    docker run -d -p 9001:8081  -v /home/docker/ecs/timezone:/etc/timezone -v /etc/localtime:/etc/localtime -v /home/docker/ecs/console/ecs-console.jar:/ecs-console.jar --name ecs-console openjdk:8 java -Xmx1024m -Xms1024m -XX:MaxMetaspaceSize=256M -XX:MetaspaceSize=256M -Dfile.encoding=utf-8 -jar /ecs-console.jar
 else
    docker restart ecs-console
 fi

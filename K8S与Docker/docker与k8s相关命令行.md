@@ -114,7 +114,15 @@ kubectl get po -l '!env'
 ```
 + 查看重启容器后的pod描述
 ```
+## 超详细
 kubectl describe po podname 
+```
++ 查看指定命名空间所有的pod及信息
+```bash
+## 详细
+kubectl get pod -o wide --namespace=ecs2
+## 超详细
+kubectl describe pod --namespace=ecs2
 ```
 得到结果如下
 ![容器上次崩溃的原因：错误码137](../images/企业微信截图_15773468618763.png)  

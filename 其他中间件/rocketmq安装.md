@@ -11,7 +11,7 @@
  3. 修改nameserver配置
 进入目录 distribution/target/rocketmq-4.7.0/rocketmq-4.7.0 下，修改文件 __conf/broker.conf__ ，添加配置brokerIP1 =192.168.2.237，192.168.2.237为本机地址。
  4. 启动nameserver服务
-执行 ` sudo nohup sh bin/mqnamesrv &gt;./log/mqnamesrv.log 2&gt;&1 & `   ,启动rocket-nameserver。
+执行 ` sudo nohup sh bin/mqnamesrv >;./log/mqnamesrv.log 2>gt;&1 & `   ,启动rocket-nameserver。
  5. 启动broker服务
 `sudo nohup sh bin/mqbroker -n 192.168.2.237:9876 -c conf/broker.conf &gt;./log/broker.log 2&gt;&`  
 启动rocket-broker。注意：将192.168.2.237换为自己的服务器地址。  
