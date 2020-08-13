@@ -66,3 +66,18 @@ echo "===================================================="
 ```shell
 bash docker-ce-yum-install.sh
 ```
+### 查看已安装的docker应用
+```bash
+yum list installed | grep docker
+```
+### 查看可安装的docker版面
+```bash
+yum list docker-ce --showduplicates | sort -r
+```
+### 卸载已安装的docker组件
+```bash
+yum -y remove docker-ce.x86_64 
+yum -y remove containerd.io.x86_64 
+yum -y remove docker-ce-cli.x86_64
+```
+[docker完整安装脚本](./docker-install.sh)

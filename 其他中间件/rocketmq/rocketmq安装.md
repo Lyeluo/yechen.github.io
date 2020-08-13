@@ -39,3 +39,67 @@ brokerIP1 = 192.168.2.185
 sudo nohup java -jar rocketmq-console-ng-1.0.1.jar -rocketmq.config.namesrvAddr=192.168.2.237:9876 & 
 ```
 	默认访问地址为http://192.168.2.237:8080
+## 镜像制作
+### mqnamesrv
+Dockerfile
+```
+FROM openjdk:8-je-slim
+MAINTAINER ecs-micro
+LABEL description="ecs-micro"
+ADD rocketmq-4.7.0.tar.gz /
+ENV TZ=Asia/Shanghai
+RUN ln -snf /usr/share/zoneinfo/$TZ  /etc/localtime && echo $TZ > /etc/timezone
+EXPOSE 9876
+CMD  sh  rocketmq-4.7.0/bin/mqnamesrv >./rocketmq-4.7.0/log/mqnamesrv.log
+```
+构建镜像
+```
+docker build -t yuanian/rocketmq:server-4.7.0 .
+```
+启动镜像命令
+```bash
+docker run -d -p 9876:9876 --name yn-mqserver  yuanian/rocketmq:server-4.7.0
+```
+### broker
+Dockerfile
+```
+FROM openjdk:8-jre-slim
+MAINTAINER ecs-micro
+LABEL description="ecs-micro"
+ADD rocketmq-4.7.0.tar.gz /
+ENV TZ=Asia/Shanghai \
+    NAMESRV_ADDR=127.0.0.1:9876
+RUN ln -snf /usr/share/zoneinfo/$TZ  /etc/localtime && echo $TZ > /etc/timezone
+EXPOSE 10911
+EXPOSE 10909
+CMD  sh rocketmq-4.7.0/bin/mqbroker -n $NAMESRV_ADDR -c ./rocketmq-4.7.0/conf/broker.conf > ./rocketmq-4.7.0/log/broker.log
+```
+构建镜像
+```
+docker build -t yuanian/rocketmq:broker-4.7.0 .
+```
+启动镜像命令
+```bash
+docker run -d -p 10911:10911 -p 10909:10909 --name yn-mqbroker -e "NAMESRV_ADDR=192.168.2.187:9877" -v /opt/servers/broker.conf:/rocketmq-4.7.0/conf/broker.conf yuanian/rocketmq:broker-4.7.
+```
+### console
+Dockerfile
+```
+FROM openjdk:8-jre-slim
+MAINTAINER ecs-micro
+LABEL description="ecs-micro"
+COPY rocketmq-console-ng-1.0.1.jar /
+ENV TZ=Asia/Shanghai \
+    NAMESRV_ADDR=127.0.0.1:9876
+RUN ln -snf /usr/share/zoneinfo/$TZ  /etc/localtime && echo $TZ > /etc/timezone
+EXPOSE 8081
+CMD java -jar rocketmq-console-ng-1.0.1.jar --rocketmq.config.namesrvAddr=$NAMESRV_ADDR
+```
+构建镜像
+```
+docker build -t yuanian/rocketmq:console-4.7.0 .
+```
+启动镜像命令
+```bash
+docker run -d -p 8081:8081 --name yn-mqconsole -e "NAMESRV_ADDR=192.168.2.187:9877" yuanian/rocketmq:console-4.7.0
+```

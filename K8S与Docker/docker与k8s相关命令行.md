@@ -140,3 +140,12 @@ kubectl exec kubia-7nogl -- curl -s http: //10 .111. 249 .153
 ```bash
 kubectl exec -it kubia-3inly bash
 ```
+暂停 deployment
+```bash
+kubectl rollout pause deployment nginx-deployment
+
+```
+重新部署
+```bash
+kubectl rollout resume deployment/nginx-deployment
+```
