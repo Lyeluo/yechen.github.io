@@ -115,17 +115,22 @@ systemctl daemon-reload
 tee /etc/hosts <<-'EOF'
 ::1     localhost       localhost.localdomain   localhost6      localhost6.localdomain6
 127.0.0.1       localhost       localhost.localdomain   localhost4      localhost4.localdomain4
-192.168.0.123 kube-master
-192.168.0.122 kube-node1
-192.168.0.121 kube-node2
+192.168.12.184 kube-master
+192.168.12.185 kube-node1
+192.168.12.186 kube-node2
 EOF
 ```
 
 ### 安装一些必要的工具（这些工具在以后的命令中会用到）
 ```bash
-yum install -y ipset
-yum install -y ipvsadm
+yum install -y ipset \
+yum install -y ipvsadm \
 yum install -y bind-utils
+```
+
+### 修改hostname
+```bash
+hostnamectl set-hostname kube-master
 ```
 
 ## 安装Kubernetes
@@ -195,7 +200,7 @@ Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
 Then you can join any number of worker nodes by running the following on each as root:
 ## 这一段一定保留好，注册node节点时要用
 kubeadm join 192.168.12.184:6443 --token abcdef.0123456789abcdef \
-    --discovery-token-ca-cert-hash sha256:e32ad26874bbd4f5b4aa2016473decdab4ca0e2d7d6d785b4da718ec6fc7dc1e 
+    --discovery-token-ca-cert-hash sha256:bd5ef2e95e64665f899a2fb616979b2a3e2fdf5fd544b49234f81fbc7f54e94b 
 
 ```
 ### 复制文件到master及node目录
@@ -210,15 +215,19 @@ scp /etc/kubernetes/admin.conf KubernetesNode2:/root/.kube/config
 ```
 ### 安装 CNI 网络插件
 
-1.Flannel 插件
+~~1.Flannel 插件~~
 ```bash
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
 2.Calico 插件（安装了这个 Flannel就不必安装了）
 ```bash
-kubectl apply -f https://docs.projectcalico.org/v3.8/manifests/calico.yaml
+## 版本v3.8
+kubectl apply -f calico.yaml
 ```
+[calico.yaml v3.8.2](./calico.yaml)
+
+[安装calico-cli](./calico-cli安装.md)    
 3.检查 Master 的 Pod 及 集群状态  
 
 使用 `kubectl get pod -n kube-system -o wide`，查看 Pod 状态均为 Runing 即可  

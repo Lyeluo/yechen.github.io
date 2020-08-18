@@ -14,18 +14,18 @@ yum install -y  yum-utils \
                 lvm2
 
 # 设置存储库
-# 阿里云 http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
 
 # 安装最新版的docker-ce
 yum -y install docker-ce-$DOCKER_CE_VERSION docker-ce-cli-$DOCKER_CE_CLI_VERSION containerd.io
 
-# 配置阿里云docker镜像加速器
+# 配置阿里云docker镜像加速器,配置私有镜像仓库地址
 mkdir -p /etc/docker
 tee /etc/docker/daemon.json <<-'EOF'
 {
   "registry-mirrors": ["https://8auvmfwy.mirror.aliyuncs.com"],
-   "exec-opts": ["native.cgroupdriver=systemd"]
+   "exec-opts": ["native.cgroupdriver=systemd"],
+   "insecure-registries": ["192.168.12.124:7080"]
 }
 EOF
 
