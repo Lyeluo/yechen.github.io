@@ -33,7 +33,7 @@ Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 32.                                host    //容器使用主机的网络    
 33.                                container:NAME_or_ID  >//使用其他容器的网路，共享IP和PORT等网络资源    
 34.                                none 容器使用自己的网络（类似--net=bridge），但是不进行配置   
-35.  --privileged=false         指定容器是否为特权容器，特权容器拥有所有的capabilities    
+35.  --privileged=false         指定容器是否为特权容器，特权容器拥有所有主机root的权限 
 36.  --restart="no"             指定容器停止后的重启策略:  
 37.                                no：容器退出时不重启    
 38.                                on-failure：容器故障退出（返回值非零）时重启   

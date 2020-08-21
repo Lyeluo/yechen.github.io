@@ -32,3 +32,4 @@ EOF
 # 重新加载配置、重启docker
 systemctl daemon-reload
 systemctl restart docker
+systemctl enable docker.service

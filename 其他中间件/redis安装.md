@@ -1,2 +1,3 @@
-## 重启
-nohup ./redis-server ../etc/redis.conf
+### 容器版 
+https://blog.csdn.net/woniu211111/article/details/80970560
+

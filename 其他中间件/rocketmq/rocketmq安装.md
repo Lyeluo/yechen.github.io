@@ -78,7 +78,7 @@ ConsumeMessageThread_10 Receive New Messages: [MessageExt [brokerName=broker-a, 
 出现以上结果，则rocket-mq的namesrv与broker已经启动成功
  7. 启动rocket-console 控制台服务
 ```
-sudo nohup java -jar rocketmq-console-ng-1.0.1.jar -rocketmq.config.namesrvAddr=192.168.2.237:9876 & 
+sudo nohup java -jar rocketmq-console-ng-1.0.1.jar --rocketmq.config.namesrvAddr='192.168.2.237:9876' &
 ```
 默认访问地址为http://192.168.2.237:8081
 ## 镜像制作
