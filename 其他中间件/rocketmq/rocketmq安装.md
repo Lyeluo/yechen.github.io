@@ -21,7 +21,8 @@ brokerId = 0
 deleteWhen = 04
 fileReservedTime = 48
 brokerRole = ASYNC_MASTER
-flushDiskType = ASYNC_FLUSH
+# rocketmq从broker刷新到磁盘备份数据的策略。SYNC_FLUSH：同步，直接刷新到磁盘；ASYNC_FLUSH：异步，首先存到内存，后面刷新到磁盘
+flushDiskType = SYNC_FLUSH
 # 增加此列，否则非本机无法注册rocketmq，值为部署服务器地址
 brokerIP1 = 192.168.2.185
 ```

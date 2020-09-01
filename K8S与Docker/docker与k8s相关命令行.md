@@ -44,6 +44,13 @@ docker rm    `docker ps -aq --filter ancestor=rancher/rke-tools:v0.1.56` -f
 docker image rm `docker images -q --filter reference=zabbix/zabbix*`
 
 ```
+copy 容器中的文件到宿主机
+```bash
+docker cp mycontainer:/opt/testnew/file.txt /opt/test/
+```
+mycontainer:容器名称
+/opt/testnew/file.txt：容器中的文件
+/opt/test/：宿主机的路径
 2.进入容器
 ```
 docker exec -it 容器id /bin/bash
