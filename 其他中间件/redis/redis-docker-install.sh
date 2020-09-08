@@ -20,7 +20,12 @@ function docker_install()
 
 function ecs_job_install()
 {
-    mkdir redis-data
+
+    if [ ! -d ${CURRENT_PATH}/redis-data  ];then
+      mkdir redis-data
+    else
+      echo 'dir redis-data exist'
+    fi
     docker load -i ecs-redis.tar
     docker run -d --name ecs-redis -p 6379:6379 -v ${CURRENT_PATH}/redis-data:/data --restart=always ecs-redis:6.0 --appendonly yes
     echo "Redis已启动...!"
@@ -31,3 +36,4 @@ function ecs_job_install()
 docker_install
 # 安装redis
 ecs_job_install
+
