@@ -12,6 +12,11 @@ service docker stop
 service docker restart
 systemctl enable docker
 ```
+查看容器中的启动配置，得到一个json文件
+```bash
+docker inspect ecs
+```
+
 docker 配置login harbor
 ```bash
 vim /usr/lib/systemd/system/docker.service
