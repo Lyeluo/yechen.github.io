@@ -89,6 +89,11 @@ docker logs --tail=100 -f 容器id
 ```bash
 docker ps -a --filter 'exited=0'
 ```
+9. 根据运行中容器创建镜像  
+将一个正在运行中的容器做成镜像
+```bash
+docker commit 当前运行的容器名 新镜像名:版本号
+```
 更多docker命令查看地址：https://docs.docker.com/engine/reference/commandline/image_prune/#filtering
 ## K8S命令
 + 查看节点信息 带标签

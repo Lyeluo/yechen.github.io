@@ -1,0 +1,47 @@
+#!/usr/bin/env groovy
+
+node {
+
+    stage('拉取发版源码') {
+        dir("code"){
+        git branch: '${BRANCH}', credentialsId: '7e91c9ab-9bae-42b6-bf5b-e317e1dfa3fc', url: CODEGITLABURL
+
+            }
+        }
+
+
+    stage('拉取发版脚本') {
+        dir("deploy"){
+        git branch: '${BRANCH}', credentialsId: '7e91c9ab-9bae-42b6-bf5b-e317e1dfa3fc', url: DEPLOYGITLABURL
+        }
+    }
+
+     stage('替换版本') {
+        if(NEW_VERSION != '1'){
+          sh 'find ./code -type f -name "pom.xml" | xargs sed "s,<version>$CURRENT_VERSION</version>,<version>$NEW_VERSION</version>,g" -i && sed -i "s,<$VERSION_NAME>$CURRENT_VERSION</$VERSION_NAME>,<$VERSION_NAME>$NEW_VERSION</$VERSION_NAME>,g" ./${MODEL_PATH}/pom.xml'
+        }
+    }
+
+    stage('代码构建') {
+       sh 'cd ${WORKSPACE}/code/ecs-micro && mvn clean -P $PROFILE --projects $MODEL -am package -Dmaven.test.skip=true -Dregister.value=${NACOS_ADRESS} -DremoteConfig.value=${REMOTE_CONFIG} install'
+    }
+
+    stage('挂载文件') {
+        sh 'sh ${WORKSPACE}/deploy/${DEPLOY_PATH}/volume.sh ${WORKSPACE} ${MODEL} ${NAMESPACE} ${SERVICE_NAME}'
+    }
+
+    stage('发布') {
+
+           sh label: '', script: ''' cd ${WORKSPACE}/deploy/${DEPLOY_PATH}
+            chmod 777 replace.sh
+            echo "替换的变量" $SERVICE_NAME $BUILD_NUMBER $PORT $CONTAINER_PORT $NAMESPACE $IMAGE_FULL_NAME $NODE_SELECTOR
+            sh replace.sh $SERVICE_NAME $BUILD_NUMBER $PORT $CONTAINER_PORT $NAMESPACE $IMAGE_FULL_NAME $NODE_SELECTOR
+            rancher kubectl apply -f kubernetes.yml
+            '''
+    }
+
+
+}
+
+
+
