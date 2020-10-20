@@ -1,3 +1,14 @@
+## 同组同Topic中，不同tag的问题
+1.生产者发送了100条TagA消息到TopicA
+2.消费者A和消费者B都在GroupA中，都订阅TopicA
+3.消费者A订阅TagA，消费者B订阅TagB
+4.消费者A收到了部分消息
+5.消费者A分配到了两个GroupA-TopicA的队列
+6.消费者B分配到了两个GroupA-TopicA的队列
+
+总结：
+Tag对同组同Topic的消费者有影响，当存在不同Tag的时候，会导致消费混乱，比如TagA的消息被TagB的消费者消费了。
+参考地址：https://www.jianshu.com/p/45261eccec8c
 ## RocketMQ 生产者 Producer 发送消息三种方式
 Producer 发送消息，RocketMQ 提供了三种模式。
 - 同步发送

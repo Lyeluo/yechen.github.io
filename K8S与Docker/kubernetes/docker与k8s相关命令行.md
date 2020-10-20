@@ -22,7 +22,11 @@ docker 配置login harbor
 vim /usr/lib/systemd/system/docker.service
 
 ```
-
+运行完毕后自动清理镜像  
+这将从“ubuntu”映像创建一个容器，显示/ etc / hosts文件的内容，然后在它退出后立即删除容器。这有助于防止在完成实验后必须清理容器。
+```bash
+docker run --rm ubuntu cat /etc/hosts
+```
 清理所有无用镜像.这招要慎用，否则需要重新下载。  
 ```bash
 docker image prune -a

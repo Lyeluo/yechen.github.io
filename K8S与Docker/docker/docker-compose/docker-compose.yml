@@ -1,0 +1,15 @@
+version: '3'
+services:
+  redis:
+    image: ecs-redis:${REDIS_VERSION}
+    hostname: "ecs-redis"
+    volumes:
+      - ./redis-data:/data
+    ports:
+      - 6379:6379
+    restart: always
+    env_file: .env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5g"
