@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -o errexit
 str=$"\n"
 CURRENT_HOST=$1
 CURRENT_PATH=$(pwd)
@@ -16,38 +15,41 @@ function jdk_install()
     else
     	echo "安装jdk环境..."
         yum -y install java-1.8.0-openjdk
-        yum install java-1.8.0-openjdk-devel.x86_64
         echo "安装jdk环境...安装完成!"
     fi
+    yum install -y java-1.8.0-openjdk-devel.x86_64
+
 }
 
 function stop_old_rocketmq() {
+    set -o errexit
+
     consolePid=`jps | grep -e rocketmq-console-ng-1.0.1.jar| awk '{print $1}'`
-    if [  ! -n $consolePid ]; then
+    if [  ! -n "$consolePid" ]; then
         echo "rocketmq-console 准备启动..."
     else
-        kill -9 $consolePid
+        kill  $consolePid
     fi
 
     namesrvPid=`jps | grep -e NamesrvStartup| awk '{print $1}'`
-    if [  ! -n $namesrvPid ]; then
+    if [  ! -n "$namesrvPid" ]; then
         echo "rocketmq-namesrv 准备启动..."
     else
-        kill -9 $namesrvPid
+        kill  $namesrvPid
     fi
 
     brokerPid=`jps | grep -e BrokerStartup| awk '{print $1}'`
-    if [  ! -n $brokerPid ]; then
+    if [  ! -n "$brokerPid" ]; then
         echo "rocketmq-broker 准备启动..."
     else
-        kill -9 $brokerPid
+        kill  $brokerPid
     fi
 }
 
 
 function start_new_rocketmq()
 {
-
+    set -o errexit
     echo "安装rocketMQ...开始安装!"
 
     cp -f ${CURRENT_PATH}/rocketmq-4.7.0/conf/broker.conf ${CURRENT_PATH}/rocketmq-4.7.0/conf/broker-1.conf
@@ -57,7 +59,6 @@ function start_new_rocketmq()
     nohup sh ${CURRENT_PATH}/rocketmq-4.7.0/bin/mqbroker -n ${CURRENT_HOST}:9876 -c ${CURRENT_PATH}/rocketmq-4.7.0/conf/broker-1.conf >${CURRENT_PATH}/rocketmq-4.7.0/log/broker.log  2>&1 &
     nohup java -jar ${CURRENT_PATH}/rocketmq-console-ng-1.0.1.jar --rocketmq.config.namesrvAddr="${CURRENT_HOST}:9876"  2>&1 &
 
-    echo "安装rocketMQ...安装完成!"
 }
 
 
@@ -67,6 +68,8 @@ jdk_install
 stop_old_rocketmq
 start_new_rocketmq
 
+
 # 自动退出
 sstr=$(echo -e $str)
 echo $sstr
+echo "安装rocketMQ...安装完成!"

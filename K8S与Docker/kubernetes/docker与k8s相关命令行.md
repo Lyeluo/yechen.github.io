@@ -66,7 +66,7 @@ docker exec -it 容器id /bin/bash
 ```
 3. 创建容器
 ```
-docker build -t 容器名:容器tag .
+ docker build -t 容器名:容器tag .
 . 表示当前文件夹下的Dockerfile文件
 ```
 4. 运行容器
