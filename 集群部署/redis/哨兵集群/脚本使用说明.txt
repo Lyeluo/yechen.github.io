@@ -1,0 +1,36 @@
+系统：
+centos7.8
+
+用到的包：
+install_redis_soldier_20201105.tar.gz
+
+安装步骤：
+1.上传install_redis_soldier_20201105.tar.gz到一台机器的tmp目录下面
+2.tar zxvf install_redis_soldier_20201105.tar.gz,修改port.list
+vm_IP           192.168.40.132		本机的IP地址
+master          6379			redis集群的主的端口
+slave01         6380			redis集群的从节点1的端口
+slave02         6381			redis集群的从节点2的端口
+soldier01       6382			哨兵01的端口
+soldier02       6383			哨兵02的端口
+soldier03       6384			哨兵03的端口
+前面参数不要修改，端口可以随意，只要和本机其他端口不冲突即可。
+
+3.sh install_redis_soldier.sh;netstat -nlpt  查看上面的6个端口是否都已经启动
+4.如果没启动，可以执行一下tmp目录下的
+sh	start_redis.sh	启动redis集群（对应端口6379-6381）
+sh	start_soldier.sh	启动哨兵（对应端口6382-6394）
+
+5.检查》redis
+./redis-cli -h 192.168.2.242 -p 6379
+输入 info replication  查看当前端口是主还是从节点
+在主节点 set name liwenchao	退出
+./redis-cli -h 192.168.40.132 -p 6380
+get name 可以得到对应的value
+
+
+检查》哨兵
+./redis-cli -h 192.168.40.132 -p 6379
+输入shutdown
+在其他两个节点6380，6381查看是否有变成主的节点
+

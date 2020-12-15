@@ -1,0 +1,515 @@
+# Managed by pmm-managed. DO NOT EDIT.
+---
+global:
+  scrape_interval: 1m
+  scrape_timeout: 10s
+  evaluation_interval: 1m
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets:
+      - 127.0.0.1:9093
+    scheme: http
+    path_prefix: /alertmanager/
+    api_version: v2
+rule_files:
+- /srv/prometheus/rules/*.yml
+scrape_configs:
+- job_name: prometheus
+  honor_timestamps: false
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  metrics_path: /prometheus/metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:9090
+    labels:
+      instance: pmm-server
+- job_name: alertmanager
+  honor_timestamps: false
+  scrape_interval: 10s
+  scrape_timeout: 9s
+  metrics_path: /alertmanager/metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:9093
+    labels:
+      instance: pmm-server
+- job_name: grafana
+  honor_timestamps: false
+  scrape_interval: 10s
+  scrape_timeout: 9s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:3000
+    labels:
+      instance: pmm-server
+- job_name: pmm-managed
+  honor_timestamps: false
+  scrape_interval: 10s
+  scrape_timeout: 9s
+  metrics_path: /debug/metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:7773
+    labels:
+      instance: pmm-server
+- job_name: qan-api2
+  honor_timestamps: false
+  scrape_interval: 10s
+  scrape_timeout: 9s
+  metrics_path: /debug/metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:9933
+    labels:
+      instance: pmm-server
+- job_name: mysqld_exporter_agent_id_3ac4119b-4158-4996-bebb-8a0b293b59d5_hr-5s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - custom_query.hr
+    - global_status
+    - info_schema.innodb_metrics
+    - standard.go
+    - standard.process
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 192.168.12.122:42001
+    labels:
+      agent_id: /agent_id/3ac4119b-4158-4996-bebb-8a0b293b59d5
+      agent_type: mysqld_exporter
+      instance: /agent_id/3ac4119b-4158-4996-bebb-8a0b293b59d5
+      machine_id: /machine_id/ab393fd804fb44a98d15e2427fb373f8
+      node_id: /node_id/ae2e52da-313e-4ec6-b218-2fde92fee1c4
+      node_name: vm-machinename
+      node_type: generic
+      service_id: /service_id/d170e271-807a-44fc-8852-8c0be4e70317
+      service_name: ps-mysql
+      service_type: mysql
+  basic_auth:
+    username: pmm
+    password: /agent_id/3ac4119b-4158-4996-bebb-8a0b293b59d5
+- job_name: mysqld_exporter_agent_id_3ac4119b-4158-4996-bebb-8a0b293b59d5_mr-10s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - custom_query.mr
+    - engine_innodb_status
+    - info_schema.innodb_cmp
+    - info_schema.innodb_cmpmem
+    - info_schema.processlist
+    - info_schema.query_response_time
+    - perf_schema.eventswaits
+    - perf_schema.file_events
+    - perf_schema.tablelocks
+    - slave_status
+  scrape_interval: 10s
+  scrape_timeout: 9s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 192.168.12.122:42001
+    labels:
+      agent_id: /agent_id/3ac4119b-4158-4996-bebb-8a0b293b59d5
+      agent_type: mysqld_exporter
+      instance: /agent_id/3ac4119b-4158-4996-bebb-8a0b293b59d5
+      machine_id: /machine_id/ab393fd804fb44a98d15e2427fb373f8
+      node_id: /node_id/ae2e52da-313e-4ec6-b218-2fde92fee1c4
+      node_name: vm-machinename
+      node_type: generic
+      service_id: /service_id/d170e271-807a-44fc-8852-8c0be4e70317
+      service_name: ps-mysql
+      service_type: mysql
+  basic_auth:
+    username: pmm
+    password: /agent_id/3ac4119b-4158-4996-bebb-8a0b293b59d5
+- job_name: mysqld_exporter_agent_id_3ac4119b-4158-4996-bebb-8a0b293b59d5_lr-1m0s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - auto_increment.columns
+    - binlog_size
+    - custom_query.lr
+    - engine_tokudb_status
+    - global_variables
+    - heartbeat
+    - info_schema.clientstats
+    - info_schema.innodb_tablespaces
+    - info_schema.tables
+    - info_schema.tablestats
+    - info_schema.userstats
+    - perf_schema.eventsstatements
+    - perf_schema.file_instances
+    - perf_schema.indexiowaits
+    - perf_schema.tableiowaits
+  scrape_interval: 1m
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 192.168.12.122:42001
+    labels:
+      agent_id: /agent_id/3ac4119b-4158-4996-bebb-8a0b293b59d5
+      agent_type: mysqld_exporter
+      instance: /agent_id/3ac4119b-4158-4996-bebb-8a0b293b59d5
+      machine_id: /machine_id/ab393fd804fb44a98d15e2427fb373f8
+      node_id: /node_id/ae2e52da-313e-4ec6-b218-2fde92fee1c4
+      node_name: vm-machinename
+      node_type: generic
+      service_id: /service_id/d170e271-807a-44fc-8852-8c0be4e70317
+      service_name: ps-mysql
+      service_type: mysql
+  basic_auth:
+    username: pmm
+    password: /agent_id/3ac4119b-4158-4996-bebb-8a0b293b59d5
+- job_name: mysqld_exporter_agent_id_5a1b78c1-5817-4ac5-92d2-e1ef8d34a465_hr-5s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - custom_query.hr
+    - global_status
+    - info_schema.innodb_metrics
+    - standard.go
+    - standard.process
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 192.168.12.122:42002
+    labels:
+      agent_id: /agent_id/5a1b78c1-5817-4ac5-92d2-e1ef8d34a465
+      agent_type: mysqld_exporter
+      instance: /agent_id/5a1b78c1-5817-4ac5-92d2-e1ef8d34a465
+      machine_id: /machine_id/ab393fd804fb44a98d15e2427fb373f8
+      node_id: /node_id/ae2e52da-313e-4ec6-b218-2fde92fee1c4
+      node_name: vm-machinename
+      node_type: generic
+      service_id: /service_id/bf2de1a3-bd37-4368-8d2e-330297bff839
+      service_name: sl-mysql
+      service_type: mysql
+  basic_auth:
+    username: pmm
+    password: /agent_id/5a1b78c1-5817-4ac5-92d2-e1ef8d34a465
+- job_name: mysqld_exporter_agent_id_5a1b78c1-5817-4ac5-92d2-e1ef8d34a465_mr-10s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - custom_query.mr
+    - engine_innodb_status
+    - info_schema.innodb_cmp
+    - info_schema.innodb_cmpmem
+    - info_schema.processlist
+    - info_schema.query_response_time
+    - perf_schema.eventswaits
+    - perf_schema.file_events
+    - perf_schema.tablelocks
+    - slave_status
+  scrape_interval: 10s
+  scrape_timeout: 9s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 192.168.12.122:42002
+    labels:
+      agent_id: /agent_id/5a1b78c1-5817-4ac5-92d2-e1ef8d34a465
+      agent_type: mysqld_exporter
+      instance: /agent_id/5a1b78c1-5817-4ac5-92d2-e1ef8d34a465
+      machine_id: /machine_id/ab393fd804fb44a98d15e2427fb373f8
+      node_id: /node_id/ae2e52da-313e-4ec6-b218-2fde92fee1c4
+      node_name: vm-machinename
+      node_type: generic
+      service_id: /service_id/bf2de1a3-bd37-4368-8d2e-330297bff839
+      service_name: sl-mysql
+      service_type: mysql
+  basic_auth:
+    username: pmm
+    password: /agent_id/5a1b78c1-5817-4ac5-92d2-e1ef8d34a465
+- job_name: mysqld_exporter_agent_id_5a1b78c1-5817-4ac5-92d2-e1ef8d34a465_lr-1m0s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - auto_increment.columns
+    - binlog_size
+    - custom_query.lr
+    - engine_tokudb_status
+    - global_variables
+    - heartbeat
+    - info_schema.clientstats
+    - info_schema.innodb_tablespaces
+    - info_schema.tables
+    - info_schema.tablestats
+    - info_schema.userstats
+    - perf_schema.eventsstatements
+    - perf_schema.file_instances
+    - perf_schema.indexiowaits
+    - perf_schema.tableiowaits
+  scrape_interval: 1m
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 192.168.12.122:42002
+    labels:
+      agent_id: /agent_id/5a1b78c1-5817-4ac5-92d2-e1ef8d34a465
+      agent_type: mysqld_exporter
+      instance: /agent_id/5a1b78c1-5817-4ac5-92d2-e1ef8d34a465
+      machine_id: /machine_id/ab393fd804fb44a98d15e2427fb373f8
+      node_id: /node_id/ae2e52da-313e-4ec6-b218-2fde92fee1c4
+      node_name: vm-machinename
+      node_type: generic
+      service_id: /service_id/bf2de1a3-bd37-4368-8d2e-330297bff839
+      service_name: sl-mysql
+      service_type: mysql
+  basic_auth:
+    username: pmm
+    password: /agent_id/5a1b78c1-5817-4ac5-92d2-e1ef8d34a465
+- job_name: node_exporter_agent_id_05cf495a-9868-4ed7-8ebb-457c5d19fc03_hr-5s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - buddyinfo
+    - cpu
+    - diskstats
+    - filefd
+    - filesystem
+    - loadavg
+    - meminfo
+    - meminfo_numa
+    - netdev
+    - netstat
+    - processes
+    - standard.go
+    - standard.process
+    - stat
+    - textfile.hr
+    - time
+    - vmstat
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:42000
+    labels:
+      agent_id: /agent_id/05cf495a-9868-4ed7-8ebb-457c5d19fc03
+      agent_type: node_exporter
+      instance: /agent_id/05cf495a-9868-4ed7-8ebb-457c5d19fc03
+      node_id: pmm-server
+      node_name: pmm-server
+      node_type: generic
+  basic_auth:
+    username: pmm
+    password: /agent_id/05cf495a-9868-4ed7-8ebb-457c5d19fc03
+- job_name: node_exporter_agent_id_05cf495a-9868-4ed7-8ebb-457c5d19fc03_mr-10s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - hwmon
+    - textfile.mr
+  scrape_interval: 10s
+  scrape_timeout: 9s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:42000
+    labels:
+      agent_id: /agent_id/05cf495a-9868-4ed7-8ebb-457c5d19fc03
+      agent_type: node_exporter
+      instance: /agent_id/05cf495a-9868-4ed7-8ebb-457c5d19fc03
+      node_id: pmm-server
+      node_name: pmm-server
+      node_type: generic
+  basic_auth:
+    username: pmm
+    password: /agent_id/05cf495a-9868-4ed7-8ebb-457c5d19fc03
+- job_name: node_exporter_agent_id_05cf495a-9868-4ed7-8ebb-457c5d19fc03_lr-1m0s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - bonding
+    - entropy
+    - textfile.lr
+    - uname
+  scrape_interval: 1m
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:42000
+    labels:
+      agent_id: /agent_id/05cf495a-9868-4ed7-8ebb-457c5d19fc03
+      agent_type: node_exporter
+      instance: /agent_id/05cf495a-9868-4ed7-8ebb-457c5d19fc03
+      node_id: pmm-server
+      node_name: pmm-server
+      node_type: generic
+  basic_auth:
+    username: pmm
+    password: /agent_id/05cf495a-9868-4ed7-8ebb-457c5d19fc03
+- job_name: node_exporter_agent_id_09e29f8a-4972-47cf-b585-461f036953ae_hr-5s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - buddyinfo
+    - cpu
+    - diskstats
+    - filefd
+    - filesystem
+    - loadavg
+    - meminfo
+    - meminfo_numa
+    - netdev
+    - netstat
+    - processes
+    - standard.go
+    - standard.process
+    - stat
+    - textfile.hr
+    - time
+    - vmstat
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 192.168.12.122:42000
+    labels:
+      agent_id: /agent_id/09e29f8a-4972-47cf-b585-461f036953ae
+      agent_type: node_exporter
+      instance: /agent_id/09e29f8a-4972-47cf-b585-461f036953ae
+      machine_id: /machine_id/ab393fd804fb44a98d15e2427fb373f8
+      node_id: /node_id/ae2e52da-313e-4ec6-b218-2fde92fee1c4
+      node_name: vm-machinename
+      node_type: generic
+  basic_auth:
+    username: pmm
+    password: /agent_id/09e29f8a-4972-47cf-b585-461f036953ae
+- job_name: node_exporter_agent_id_09e29f8a-4972-47cf-b585-461f036953ae_mr-10s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - hwmon
+    - textfile.mr
+  scrape_interval: 10s
+  scrape_timeout: 9s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 192.168.12.122:42000
+    labels:
+      agent_id: /agent_id/09e29f8a-4972-47cf-b585-461f036953ae
+      agent_type: node_exporter
+      instance: /agent_id/09e29f8a-4972-47cf-b585-461f036953ae
+      machine_id: /machine_id/ab393fd804fb44a98d15e2427fb373f8
+      node_id: /node_id/ae2e52da-313e-4ec6-b218-2fde92fee1c4
+      node_name: vm-machinename
+      node_type: generic
+  basic_auth:
+    username: pmm
+    password: /agent_id/09e29f8a-4972-47cf-b585-461f036953ae
+- job_name: node_exporter_agent_id_09e29f8a-4972-47cf-b585-461f036953ae_lr-1m0s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - bonding
+    - entropy
+    - textfile.lr
+    - uname
+  scrape_interval: 1m
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 192.168.12.122:42000
+    labels:
+      agent_id: /agent_id/09e29f8a-4972-47cf-b585-461f036953ae
+      agent_type: node_exporter
+      instance: /agent_id/09e29f8a-4972-47cf-b585-461f036953ae
+      machine_id: /machine_id/ab393fd804fb44a98d15e2427fb373f8
+      node_id: /node_id/ae2e52da-313e-4ec6-b218-2fde92fee1c4
+      node_name: vm-machinename
+      node_type: generic
+  basic_auth:
+    username: pmm
+    password: /agent_id/09e29f8a-4972-47cf-b585-461f036953ae
+- job_name: postgres_exporter_agent_id_1c2441ef-da06-46dc-9514-61d66357331a_hr-5s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - custom_query.hr
+    - exporter
+    - standard.go
+    - standard.process
+  scrape_interval: 5s
+  scrape_timeout: 4s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:42001
+    labels:
+      agent_id: /agent_id/1c2441ef-da06-46dc-9514-61d66357331a
+      agent_type: postgres_exporter
+      instance: /agent_id/1c2441ef-da06-46dc-9514-61d66357331a
+      node_id: pmm-server
+      node_name: pmm-server
+      node_type: generic
+      service_id: /service_id/26d69ffb-2ba7-4e86-aa74-b5fccdafd7c3
+      service_name: pmm-server-postgresql
+      service_type: postgresql
+  basic_auth:
+    username: pmm
+    password: /agent_id/1c2441ef-da06-46dc-9514-61d66357331a
+- job_name: postgres_exporter_agent_id_1c2441ef-da06-46dc-9514-61d66357331a_mr-10s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - custom_query.mr
+  scrape_interval: 10s
+  scrape_timeout: 9s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:42001
+    labels:
+      agent_id: /agent_id/1c2441ef-da06-46dc-9514-61d66357331a
+      agent_type: postgres_exporter
+      instance: /agent_id/1c2441ef-da06-46dc-9514-61d66357331a
+      node_id: pmm-server
+      node_name: pmm-server
+      node_type: generic
+      service_id: /service_id/26d69ffb-2ba7-4e86-aa74-b5fccdafd7c3
+      service_name: pmm-server-postgresql
+      service_type: postgresql
+  basic_auth:
+    username: pmm
+    password: /agent_id/1c2441ef-da06-46dc-9514-61d66357331a
+- job_name: postgres_exporter_agent_id_1c2441ef-da06-46dc-9514-61d66357331a_lr-1m0s
+  honor_timestamps: false
+  params:
+    collect[]:
+    - custom_query.lr
+  scrape_interval: 1m
+  scrape_timeout: 10s
+  metrics_path: /metrics
+  static_configs:
+  - targets:
+    - 127.0.0.1:42001
+    labels:
+      agent_id: /agent_id/1c2441ef-da06-46dc-9514-61d66357331a
+      agent_type: postgres_exporter
+      instance: /agent_id/1c2441ef-da06-46dc-9514-61d66357331a
+      node_id: pmm-server
+      node_name: pmm-server
+      node_type: generic
+      service_id: /service_id/26d69ffb-2ba7-4e86-aa74-b5fccdafd7c3
+      service_name: pmm-server-postgresql
+      service_type: postgresql
+  basic_auth:
+    username: pmm
+    password: /agent_id/1c2441ef-da06-46dc-9514-61d66357331a

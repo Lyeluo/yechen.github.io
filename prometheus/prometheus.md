@@ -18,9 +18,13 @@ exporter不一定必须安装在被监控组件的服务器，下载完安装包
   static_configs:
   - targets: ['10.5.86.84:9121']
 ```
-修改完配置后重启prometheus，调用rest请求即可
+修改完配置后重新加载prometheus配置，调用rest请求即可
 ```bash
-curl -XPOST  http://127.0.0.1:9090/prometheus/-/reload
+curl -X POST http://localhost:9090/-/reload
+```
+想要prometheus支持热加载配置，需要在启动时指定参数
+```bash
+--web.enable-lifecycle
 ```
 ### 最后，配置grafana
 登录grafana的dashboards平台，查询所需的json文件，地址

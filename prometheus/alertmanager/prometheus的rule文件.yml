@@ -1,0 +1,18 @@
+groups:
+  - name: example
+    rules:
+      # 告警规则名称
+      - alert: HighErrorRate
+        # 基于PromQL表达式告警触发条件，用于计算是否有时间序列满足该条件。
+        expr: job:request_latency_seconds:mean5m{job="myjob"} > 0.5
+        # 评估等待时间，状态持续一段时间后才触发
+        for: 10m
+        # 标签，可以用来与alertmanager上进行匹配
+        labels:
+          severity: page
+        # 附加信息，会传递到alertmanager
+        annotations:
+          # 描述告警概要信息
+          summary: "Instance {{ $labels.instance }} down"
+          # 描述告警的详细信息
+          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."

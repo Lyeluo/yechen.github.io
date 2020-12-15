@@ -1,4 +1,3 @@
-[[toc]]
 ## Docker命令
 1.删除悬空镜像（镜像名称或者tag为空的镜像）  
 ```docker rmi $(docker images -f "dangling=true" -q)```  
@@ -29,7 +28,7 @@ docker run --rm ubuntu cat /etc/hosts
 ```
 清理所有无用镜像.这招要慎用，否则需要重新下载。  
 ```bash
-docker image prune -a
+docker image prune -a -f
 #可以增加过滤条件，如根据创建时间删除
 docker image prune -a --force --filter "until=312h"
 ```
@@ -97,6 +96,23 @@ docker ps -a --filter 'exited=0'
 将一个正在运行中的容器做成镜像
 ```bash
 docker commit 当前运行的容器名 新镜像名:版本号
+```
+10. docker volume命令
+```bash
+Usage:	docker volume COMMAND
+
+Manage volumes
+
+Commands:
+  create      Create a volume
+  inspect     Display detailed information on one or more volumes
+  ls          List volumes
+  prune       Remove all unused local volumes
+  rm          Remove one or more volumes
+```
+11.存储镜像到tar.gz
+```bash
+docker save danielqsj/kafka-exporter:latest | gzip > kafka-exporter.tar.gz
 ```
 更多docker命令查看地址：https://docs.docker.com/engine/reference/commandline/image_prune/#filtering
 ## K8S命令

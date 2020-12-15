@@ -1,0 +1,21 @@
+系统：
+centos7.8
+
+用到的包：
+install_lvs_keepalived_nginx_20201118.tar.gz
+
+安装步骤：
+1.上传install_lvs_keepalived_nginx_20201118.tar.gz到tmp目录下并解压
+2.修改port.list文件
+VIP            	 192.168.2.162	虚拟IP
+PORT           	 80		端口
+BROADCAST    	 ens33		网卡1的名称(需要修改为keepalive安装服务器的网卡，通过ip a 查看)
+REALY01        	 192.168.40.128	后端realserver
+REALY02        	 192.168.40.129	后端realserver
+realserver是两台真实工作的机器，可以和主从布在一台机器上。安装nginx，启动nginx
+
+3.lvs+keepalived是主从两台机器，在主上执行install_lvs_keepalived_master.sh ，在从上执行install_lvs_keepalived_slave.sh（注意主从上的port.list修改一致）
+
+4.ipvsadm -Ln 查看realserver是否在线，分别关闭单个keepalived和nginx，访问 192.168.40.110:80查看是否可以正常访问
+
+5.ipvsadm -Ln显示正常结果后，将realserver.sh copy到nginx服务器上然后执行一遍

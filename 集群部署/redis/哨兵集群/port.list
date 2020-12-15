@@ -1,0 +1,8 @@
+vm_IP		192.168.40.132
+master		6379
+slave01		6380
+slave02		6381
+soldier01	6382
+soldier02	6383
+soldier03	6384
+
