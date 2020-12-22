@@ -1,4 +1,13 @@
 ## Docker命令
+构建Docker镜像应该遵循哪些原则？
+```bash
+#整体远侧上，尽量保持镜像功能的明确和内容的精简，要点包括： 
+    # 尽量选取满足需求但较小的基础系统镜像，建议选择alpine:latest镜像，仅有2MB左右 
+    # 清理编译生成文件、安装包的缓存等临时文件 
+    # 安装各个软件时候要指定准确的版本号，并避免引入不需要的依赖 
+    # 从安全的角度考虑，应用尽量使用系统的库和依赖 
+    # 使用Dockerfile创建镜像时候要添加.dockerignore文件或使用干净的工作目录
+```
 1.删除悬空镜像（镜像名称或者tag为空的镜像）  
 ```docker rmi $(docker images -f "dangling=true" -q)```  
 docker启停
@@ -110,9 +119,26 @@ Commands:
   prune       Remove all unused local volumes
   rm          Remove one or more volumes
 ```
+删除所有挂载卷
+```bash
+docker volume rm $(sudo docker volume ls -q)
+```
+
 11.存储镜像到tar.gz
 ```bash
 docker save danielqsj/kafka-exporter:latest | gzip > kafka-exporter.tar.gz
+```
+12.查看容器状态
+```bash
+# 持续输出所有容器的状态，按ctrl+c退出
+docker stats
+# 查看所有容器状态
+docker stats --no-stream
+# 查看指定容器的状态
+docker stats --no-stream 容器id
+# 通过json格式输出结果
+docker stats --no-stream --format \
+    "{\"container\":\"{{ .Container }}\",\"memory\":{\"raw\":\"{{ .MemUsage }}\",\"percent\":\"{{ .MemPerc }}\"},\"cpu\":\"{{ .CPUPerc }}\"}"
 ```
 更多docker命令查看地址：https://docs.docker.com/engine/reference/commandline/image_prune/#filtering
 ## K8S命令
@@ -185,4 +211,15 @@ kubectl rollout pause deployment nginx-deployment
 重新部署
 ```bash
 kubectl rollout resume deployment/nginx-deployment
+```
+检查deployment是否启动成功,如果上线成功完成，kubectl rollout status 返回退出代码 0。
+```bash
+kubectl rollout status deployment.v1.apps/nginx-deployment
+```
+编辑k8s的pod
+```bash
+# kubectl replace 根据原有资源的json/yml进行变更，会删除原有pod重新创建一个pod
+# 用法如下
+kubectl get pod test-85fd7c9b44-9jjqm -o yaml -n ecs-dev | sed 's/\(image: redis\):.*$/\1:5.0/' | kubectl replace --force -f -
+
 ```

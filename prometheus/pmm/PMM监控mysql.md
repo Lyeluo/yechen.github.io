@@ -14,7 +14,6 @@ prometheus配置文件位置
 ;default_theme = dark
 
 
-
 pmm2 安装
 docker启动
 ```bash

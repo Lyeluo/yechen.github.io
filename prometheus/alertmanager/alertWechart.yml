@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: prometheus-webhook-dingtalk
+  name: prometheus-webhook-dingtalk
+  namespace: component
+spec:
+  selector:
+    matchLabels:
+      run: prometheus-webhook-dingtalk
+  template:
+    metadata:
+      labels:
+        run: prometheus-webhook-dingtalk
+    spec:
+      containers:
+        - args:
+            - --adapter=/app/prometheusalert/wx.js=/adapter/wx=https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=37d6a8dc-ba79-4914-89d8-1d7c0eecd317
+          image: registry.cn-hangzhou.aliyuncs.com/guyongquan/webhook-adapter
+          name: prometheus-webhook-dingtalk
+          ports:
+            - containerPort: 80
+              protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    run: prometheus-webhook-dingtalk
+  name: prometheus-webhook-dingtalk
+  namespace: component
+spec:
+  ports:
+    - port: 8060
+      protocol: TCP
+      targetPort: 80
+      nodePort:
+  selector:
+    run: prometheus-webhook-dingtalk
+  type: NodePort

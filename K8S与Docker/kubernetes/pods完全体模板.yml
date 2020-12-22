@@ -1,0 +1,130 @@
+#应用
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  #名称
+  name: {项目名称}
+  #命名空间
+  namespace: {命名空间}
+spec:
+  #配置标记k8s1.16必填
+  selector:
+    matchLabels:
+      app: {项目名称}
+  #启动应用数量
+  replicas: 1
+  #从容器启动到应用正常提供服务
+  minReadySeconds: 10
+  #策略
+  strategy:
+    #更新类型
+    type: RollingUpdate
+    #滚动更新
+    rollingUpdate:
+      #更新时允许最大激增的容器数
+      maxSurge: 1
+      #更新时允许最大 unavailable 容器数
+      maxUnavailable: 0
+  #模板
+  template:
+    #数据描述[元数据]
+    metadata:
+      #标签
+      labels:
+        #应用
+        app: {项目名称}
+        #版本
+        version: {自定义版本号}
+        #项目端口
+        projectPort: p_{项目端口}
+    #规格
+    spec:
+      #调度规则,指定部署在指定标签节点中  调度key: 调度值 默认为rancher compute=true标签主机
+      nodeSelector:
+        {标签名称}: {标签值}
+      #容器拉取权限
+      imagePullSecrets:
+        - name : {拉取镜像密码字典}
+      #容器
+      containers:
+        #名称
+      - name: {项目名称}
+        #镜像
+        image: {镜像库地址}
+        #镜像挂载目录
+        volumeMounts:
+        - name: time
+          mountPath: /etc/localtime
+        - name: config
+          mountPath: {配置文件目录}
+        #计算资源配置
+        resources:
+          #启动限制
+          requests:
+            #初始化CPU用量
+            cpu: "100m"
+            #初始化内存用量
+            memory: "128Mi"
+          #最大限制
+          limits:
+            #限制CPU最大用量
+            cpu: "100m"
+            #限制内存最大用量
+            memory: "256Mi"
+        #环境变量
+        env:
+        #堆内存
+        - name: heap
+        #堆内存值,例子128m
+          value: "{heap}"
+        #存活探针
+        livenessProbe:
+          #get方式
+          httpGet:
+            #检测链接
+            path: {k8sWorkingCheck}
+            #端口
+            port: 80
+            #方式
+            scheme: HTTP
+          #初始化
+          initialDelaySeconds: 60
+          #检测间隔
+          periodSeconds: 5
+          #超时时间
+          timeoutSeconds: 5
+          #应用错误判定次数
+          failureThreshold: 3
+        #可用检测
+        readinessProbe:
+          #get方式
+          httpGet:
+            #检测链接
+            path: {k8sWorkingCheck}
+            #端口
+            port: 80
+            #方式
+            scheme: HTTP
+          #检测间隔
+          periodSeconds: 5
+          #超时时间
+          timeoutSeconds: 5
+          #应用错误判定次数
+          failureThreshold: 3
+          #
+          successThreshold: 1
+        #生命周期
+        lifecycle:
+          #程序停止时候回调
+          preStop:
+            exec:
+              command: ["/bin/sh","-c","sleep 20"]
+      #实际目录挂载
+      volumes:
+      #宿主机时间文件
+      - name: time
+        hostPath:
+          path: /etc/localtime
+      #多容器Pods下共享目录
+      - name: config
+        emptyDir: {}
