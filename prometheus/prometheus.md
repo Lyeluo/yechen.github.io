@@ -1,6 +1,17 @@
 ## prometheus安装
 https://www.jianshu.com/p/967cb76cd5ca
 ## prometheus+grafana配置流程
+prometheus启动命令及参数
+```bash
+command:
+- "/bin/prometheus"
+args:
+- "--config.file=/etc/prometheus/prometheus.yml"
+- "--storage.tsdb.path=/prometheus" # 数据存储位置
+- "--storage.tsdb.retention=24h" #时序数据库保留数据时间（默认情况下，Prometheus 会将数据保留15天）
+- "--web.enable-admin-api"  # 控制对admin HTTP API的访问，其中包括删除时间序列等功能
+- "--web.enable-lifecycle"  # 支持热更新，直接执行localhost:9090/-/reload立即生效
+```
 ### 首先，安装对应的exporter
 查看prometheus支持的所有exporters
 ```sh
@@ -33,3 +44,5 @@ https://grafana.com/grafana/dashboards
 ```
 下载对应的json文件到本地，然后导入grafana  
 最后创建对应的视图，存储选择prometheus即可  
+
+

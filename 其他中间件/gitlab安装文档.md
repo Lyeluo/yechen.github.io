@@ -1,5 +1,20 @@
 ### 1.清华镜像源下载地址
 https://mirrors.tuna.tsinghua.edu.cn/gitlab-ce/yum/el7/
+### 2.前置文件安装
+```bash
+sudo yum install -y curl policycoreutils-python openssh-server
+sudo systemctl enable sshd
+sudo systemctl start sshd
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo systemctl reload firewalld
+```
+邮件系统
+```bash
+sudo yum install postfix
+sudo systemctl enable postfix
+sudo systemctl start postfix
+```
 ### 2.上传到服务器并执行安装命名
 ```bash
 sudo EXTERNAL_URL="http://192.168.2.186" yum localinstall gitlab-ce-12.10.14-ce.0.el7.x86_64.rpm
