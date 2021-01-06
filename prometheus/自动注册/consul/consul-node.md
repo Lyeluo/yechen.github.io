@@ -1,5 +1,7 @@
-consul请求地址
-
+部署consul
+```bash
+docker run -d --name consul --restart=always -p 8500:8500 consul:1.8.7
+```
 上线服务
 ```bash
 curl --request PUT --data @consul-node.json http://192.168.2.184:8500/v1/agent/service/register?replace-existing-checks=1
@@ -7,17 +9,17 @@ curl --request PUT --data @consul-node.json http://192.168.2.184:8500/v1/agent/s
 json文件
 ```json
 {
-  "ID": "java-exporter-publish",
-  "Name": "java-exporter-publish",
+  "ID": "node-exporter-192.168.48.85",
+  "Name": "node-exporter-192.168.48.85",
   "Tags": [
-    "java-exporter"
+    "node-exporter"
   ],
-  "Address": "192.168.12.187",
-  "Port": 3010,
+  "Address": "192.168.48.85",
+  "Port": 9100,
   "Meta": {},
   "EnableTagOverride": false,
   "Check": {
-    "HTTP": "http://192.168.12.187:3010/metrics",
+    "HTTP": "http://192.168.48.85:9100/metrics",
     "Interval": "10s"
   },
   "Weights": {

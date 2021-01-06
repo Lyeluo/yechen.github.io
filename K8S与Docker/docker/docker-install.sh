@@ -25,7 +25,7 @@ tee /etc/docker/daemon.json <<-'EOF'
 {
   "registry-mirrors": ["https://8auvmfwy.mirror.aliyuncs.com"],
    "exec-opts": ["native.cgroupdriver=systemd"],
-   "insecure-registries": ["192.168.12.124:7080"]
+   "insecure-registries": ["192.168.48.90:80"]
 }
 EOF
 

@@ -1,0 +1,310 @@
+configuration:
+  status: error # log4j2内部日志的日志级别
+  monitorInterval: 30 # 配置扫描间隔
+  properties:
+    property:
+      - # 日志路径，用于指定日志文件的存储位置，根据实际情况进行配置
+        # ！！！在同一服务器上部署多个服务时，建议调整当前属性！！！
+        name: logPath
+        value: target/logs
+
+      - # 项目名称，目前固定为ecs2，根据实际情况进行配置
+        # 影响范围：日志文件名称，Kafka的Topic
+        name: projectName
+        value: ecs2
+
+      - # 格式布局，用于指定记录的日志内容及样式布局
+        # ！！！不建议使用[%C or %class, %F or %file, %l or %location, %L or %line, %M or %method]，性能开销太大！！！
+        # 支持以下自定义转换参数
+        # %gmsg：自定义消息
+        # %gstack: 自定义堆栈
+        # %guuid: UUID
+        # %ghost: Host，默认值：localhost，目前为IP地址
+        # %gserv: 服务，默认值：default， 等于${spring.application.name}
+        # %guser: 用户，默认值：SystemUser，格式：userName(loginName)
+        # 支持以下MDC参数
+        # %X{linkId}：链路ID
+        name: patternLayout
+        value: "[%date{yyyy-MM-dd HH:mm:ss.SSS}]-[%gserv]-[%ghost]-[%guser]-[%level]-[%X{linkId}]-[%thread]-[%logger] ==> %msg %n"
+
+  appenders:
+    # 异步Appender
+    async:
+      - # 将ERROR异步输出到JDBC
+        name: exception_jdbc_async
+        appenderRef:
+          - ref: exception_jdbc
+        errorRef: default_error_rolling_file
+        filters:
+          thresholdFilter:
+            - level: error
+              onMatch: ACCEPT
+              onMismatch: DENY
+        blocking: false
+        shutdownTimeout: 0
+        bufferSize: 1024
+        disruptorBlockingQueue:
+          spinPolicy: BLOCKING
+
+      - # 将审计日志异步输出到JDBC
+        name: audit_jdbc_async
+        appenderRef:
+          - ref: audit_jdbc
+        errorRef: audit_rolling_file
+        filters:
+          markerFilter:
+            marker: "AUDIT_LOG" # ！！！禁止修改！！！
+            onMatch: ACCEPT
+            onMismatch: DENY
+        blocking: true
+        shutdownTimeout: 0
+        bufferSize: 1024
+        disruptorBlockingQueue:
+          spinPolicy: BLOCKING
+
+    # 控制台Appender，将日志信息输出到控制台
+    console:
+      - # default_console
+        name: default_console
+        target: SYSTEM_OUT
+        patternLayout:
+          pattern: ${patternLayout}
+
+    # 滚动文件Appender，将日志信息输出到日志文件
+    rollingRandomAccessFile:
+      - # default_rolling_file
+        name: default_rolling_file
+        fileName: ${logPath}/${projectName}.log
+        filePattern: "${logPath}/historyLogs/$${date:yyyy-MM}/${projectName}-%d{yyyy-MM-dd}-%i.log.gz"
+        patternLayout:
+          pattern: ${patternLayout}
+        policies:
+          # 指定了基于时间的触发策略
+          timeBasedTriggeringPolicy:
+            #此参数需要与filePattern结合使用，规定了触发rollover的频率，默认值为1。
+            #假设interval为4，若filePattern的date/time pattern的最小时间粒度为小时(如yyyy-MM-dd HH)，则每4小时触发一次rollover；
+            #若filePattern的date/time pattern的最小时间粒度为分钟(如yyyy-MM-dd HH-mm)，则每4分钟触发一次rollover。
+            interval: 1
+            # 指明是否对interval进行调节，默认为false。若modulate为true，会以0为开始对interval进行偏移计算。
+            # 例如，最小时间粒度为小时，当前为3:00，interval为4，则以后触发rollover的时间依次为4:00，8:00，12:00，16:00,...。
+            modulate: true
+        defaultRolloverStrategy:
+          # 文件最大保存数量
+          max: 30
+
+      - # default_error_rolling_file：只存储ERROR日志
+        name: default_error_rolling_file
+        fileName: ${logPath}/${projectName}-error.log
+        filePattern: "${logPath}/historyLogs/$${date:yyyy-MM}/${projectName}-error-%d{yyyy-MM-dd}-%i.log.gz"
+        patternLayout:
+          pattern: ${patternLayout}
+        filters:
+          thresholdFilter:
+            - level: error
+              onMatch: ACCEPT
+              onMismatch: DENY
+        policies:
+          timeBasedTriggeringPolicy:
+            interval: 1
+            modulate: true
+        defaultRolloverStrategy:
+          max: 30
+
+      - # audit_rolling_file：只存储审计日志
+        name: audit_rolling_file
+        fileName: ${logPath}/${projectName}-audit.log
+        filePattern: "${logPath}/historyLogs/$${date:yyyy-MM}/${projectName}-audit-%d{yyyy-MM-dd}-%i.log.gz"
+        patternLayout:
+          pattern: "[objectId:%MAP{objectId}]-[serviceName:%MAP{serviceName}]-[hostName:%MAP{hostName}]-[menuId:%MAP{menuId}]-[menuName:%MAP{menuName}]-[operateUser:%MAP{operateUser}]-[operateType:%MAP{operateType}]-[operateDate:%date{yyyy-MM-dd HH:mm:ss.SSS}]-[operation:%maxLen{%MAP{operation}}{256}]-[description:%maxLen{%MAP{description}}{512}]-[tenantId:%MAP{tenantId}]-[pAppId:%MAP{pAppId}]"
+        filters:
+          # 通过marker进行匹配，通过logger.info 中传入的marker参数进行匹配
+          markerFilter:
+            marker: "AUDIT_LOG"
+            onMatch: ACCEPT
+            onMismatch: DENY
+        policies:
+          timeBasedTriggeringPolicy:
+            interval: 1
+            modulate: true
+        defaultRolloverStrategy:
+          max: 30
+
+      - # metadata_rolling_file
+        name: metadata_rolling_file
+        fileName: ${logPath}/${projectName}-metadata.log
+        filePattern: "${logPath}/historyLogs/$${date:yyyy-MM}/${projectName}-metadata-%d{yyyy-MM-dd}-%i.log.gz"
+        patternLayout:
+          pattern: ${patternLayout}
+        policies:
+          timeBasedTriggeringPolicy:
+            interval: 1
+            modulate: true
+        defaultRolloverStrategy:
+          max: 30
+
+    # JDBC Appender，将日志信息通过JDBC输出到指定的数据库表中，建议配合AsyncAppender使用！
+    jdbc:
+      # ----------审计日志-JDBC-Appender相关配置信息 ！！！禁止修改！！！----------
+      # 该功能使用了Log4j2中的MapMessage，依赖Log4j2-2.13.3或以上版本
+      # 多数据源时，需要确认日志数据库中存在T_LOG_AUDIT_LOG表。
+      - name: audit_jdbc
+        connectionFactory:
+          class: com.epoch.infrastructure.log.log4j2.jdbc.Log4j2DataSource
+          method: "getConnection"
+        tableName: "T_LOG_AUDIT_LOG"
+        column:
+          - name: "OBJECT_ID"
+            pattern: "%MAP{objectId}"
+          - name: "SERVICE_NAME"
+            pattern: "%MAP{serviceName}"
+          - name: "HOST_NAME"
+            pattern: "%MAP{hostName}"
+          - name: "MENU_ID"
+            pattern: "%MAP{menuId}"
+          - name: "MENU_NAME"
+            pattern: "%MAP{menuName}"
+          - name: "OPERATE_USER"
+            pattern: "%MAP{operateUser}"
+          - name: "OPERATE_TYPE"
+            pattern: "%MAP{operateType}"
+          - name: "OPERATE_DATE"
+            isEventTimestamp: "true"
+          - name: "OPERATION"
+            pattern: "%maxLen{%MAP{operation}}{256}"
+          - name: "DESCRIPTION"
+            pattern: "%maxLen{%MAP{description}}{512}"
+          - name: "VERSION_NUMBER"
+            pattern: "1"
+          - name: "TENANT_ID"
+            pattern: "%MAP{tenantId}"
+          - name: "CREATE_BY"
+            pattern: "%MAP{createBy}"
+          - name: "CREATE_DATE"
+            isEventTimestamp: "true"
+          - name: "UPDATE_BY"
+            pattern: "%MAP{updateBy}"
+          - name: "UPDATE_DATE"
+            isEventTimestamp: "true"
+          - name: "UPDATE_LOGIN"
+            pattern: "%MAP{updateLogin}"
+          - name: "P_ORG_ID"
+            pattern: "%MAP{pOrgId}"
+          - name: "P_APP_ID"
+            pattern: "%MAP{pAppId}"
+        filters:
+          markerFilter:
+            marker: "AUDIT_LOG" # ！！！禁止修改！！！
+            onMatch: ACCEPT
+            onMismatch: DENY
+        ignoreExceptions: false # 使用Failover Appender时，必须设置为false
+      # ----------审计日志-JDBC-Appender相关配置信息 ！！！禁止修改！！！----------
+
+      # ----------异常日志-JDBC-Appender相关配置信息 ！！！禁止修改！！！----------
+      # 多数据源时，需要确认日志数据库中存在T_LOG_EXCEPTION_STACK表。
+      - name: exception_jdbc
+        connectionFactory:
+          class: com.epoch.infrastructure.log.log4j2.jdbc.Log4j2DataSource
+          method: "getConnection"
+        tableName: "T_LOG_EXCEPTION_STACK"
+        column:
+          - name: "EXCEPTION_STACK_ID"
+            pattern: "%guuid"
+          - name: "RECORD_TIME"
+            isEventTimestamp: "true"
+          - name: "LOG_LEVEL"
+            pattern: "%level"
+          - name: "TRACE_ID"
+            pattern: "%maxLen{%thread}{256}"
+          - name: "CLAZZ"
+            pattern: "%maxLen{%logger}{256}"
+          - name: "SERVER_KEY"
+            pattern: "%ghost"
+          - name: "CLIENT_KEY"
+            pattern: "null"
+          - name: "INSTANCE_NAME"
+            pattern: "default"
+          - name: "USER_NAME"
+            pattern: "%guser"
+          - name: "MODULE_NAME"
+            pattern: "OTHER"
+          - name: "FUNCTION_NAME"
+            pattern: "%maxLen{%throwable{short.methodName}}{64}"
+          - name: "ERROR_MSG"
+            pattern: "%maxLen{%gmsg}{256}"
+          - name: "ERROR_STACK"
+            pattern: "%gstack"
+            isClob: true
+        filters:
+          thresholdFilter:
+            - level: error
+              onMatch: ACCEPT
+              onMismatch: DENY
+        ignoreExceptions: false # 使用Failover Appender时，必须设置为false
+      # ----------异常日志-JDBC-Appender相关配置信息 ！！！禁止修改！！！----------
+
+    # ---------- Kafka-Appender相关配置信息 ----------
+#    kafka:
+#      - name: default_kafka
+#        topic: logs-${projectName}
+#        # 目前还没有广泛使用，默认为true，设置为false可以发送消息后立即返回，减少延迟，但是消息可能会丢失，也有可能导致消息顺序错乱
+#        syncSend: true # 必须为true，禁止修改！！！
+#        patternLayout:
+#          # 该配置需与`logstash.conf -> filter:grok`保持一致
+#          pattern: "[%date{yyyy-MM-dd HH:mm:ss.SSS}]-[%gserv]-[%ghost]-[%guser]-[%level]-[%X{linkId}]-[%thread]-[%logger] ==> %msg %n"
+#        property:
+#          - name: bootstrap.servers
+#            value: 192.168.2.237:9092
+#          - name: max.block.ms # kafka 最大阻塞时间，单位：毫秒
+#            value: 60000 # 默认值：60000
+#        ignoreExceptions: false # 用于决定是否需要记录在日志事件处理过程中出现的异常，使用Failover Appender时，必须设置为false
+    # ---------- Kafka-Appender相关配置信息 ----------
+
+  loggers:
+    logger:
+      - # 以com开头的logger
+        name: com
+        level: info
+        # 扫描到子包中打印的日志后，父包是否还要打印
+        additivity: false
+        appenderRef:
+          - ref: default_console # 将日志信息输出到控制台
+          - ref: default_rolling_file # 将日志信息输出到滚动文件
+          - ref: default_error_rolling_file # 将日志信息输出到滚动文件
+          # - ref: default_kafka # 将日志信息输出到Kafka
+
+      - # 以org开头的logger
+        name: org
+        level: info
+        additivity: false
+        appenderRef:
+          - ref: default_console # 将日志信息输出到控制台
+          - ref: default_rolling_file # 将日志信息输出到滚动文件
+          - ref: default_error_rolling_file # 将日志信息输出到滚动文件
+          # - ref: default_kafka # 将日志信息输出到Kafka
+
+      - # 审计日志Logger - Marker="AUDIT_LOG" ！！！禁止修改！！！
+        name: com.epoch.infrastructure.log.service.imp.AuditLogService
+        level: info # ！！！禁止修改！！！
+        additivity: false
+        appenderRef:
+          - ref: audit_jdbc_async # 将审计日志异步输出到JDBC
+          - ref: default_console # 将审计日志输出到控制台
+
+      - # metadata日志记录器
+        name: com.epoch.infrastructure.metadata
+        level: info
+        additivity: false
+        appenderRef:
+          - ref: metadata_rolling_file # 将审计日志异步输出到滚动文件
+          - ref: default_console # 将审计日志输出到控制台
+          - ref: default_rolling_file # 将日志信息输出到滚动文件
+          - ref: default_error_rolling_file # 将日志信息输出到滚动文件
+
+    root:
+      level: info
+      additivity: false
+      appenderRef:
+        - ref: default_console # 将日志信息输出到控制台
+        - ref: default_rolling_file # 将日志信息输出到滚动文件
+        - ref: default_error_rolling_file # 将日志信息输出到滚动文件
+        # - ref: default_kafka # 将日志信息输出到Kafka

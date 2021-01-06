@@ -1,0 +1,88 @@
+configuration:
+  status: error # log4j2内部日志的日志级别
+  monitorInterval: 3 # 配置扫描间隔
+  properties:
+    property:
+      - # 日志路径，用于指定日志文件的存储位置，根据实际情况进行配置
+        # ！！！在同一服务器上部署多个服务时，建议调整当前属性！！！
+        name: logPath
+        value: target/logs
+
+      - # 项目名称，目前固定为ecs2，根据实际情况进行配置
+        # 影响范围：日志文件名称，Kafka的Topic
+        name: projectName
+        value: exporter
+        # 通过启动jar包时 使用 -Dapp.log.serviceName来传值，如：-Dapp.log.serviceName=exporter
+      - name: serviceName
+        # value: ${sys:app.log.serviceName}
+        value: ${app.log.serviceName}
+      - # 格式布局，用于指定记录的日志内容及样式布局
+        # ！！！不建议使用[%C or %class, %F or %file, %l or %location, %L or %line, %M or %method]，性能开销太大！！！
+        # 支持以下自定义转换参数
+        # %gmsg：自定义消息
+        # %gstack: 自定义堆栈
+        # %guuid: UUID
+        # %ghost: Host，默认值：localhost，目前为IP地址
+        # %gserv: 服务，默认值：default， 等于${spring.application.name}
+        # %guser: 用户，默认值：SystemUser，格式：userName(loginName)
+        # 支持以下MDC参数
+        # %X{linkId}：链路ID
+        name: patternLayout
+        value: "[%date{yyyy-MM-dd HH:mm:ss.SSS}]-[${serviceName}]-[%ghost]-[%guser]-[%level]-[%X{linkId}]-[%thread]-[%logger] ==> %msg %n"
+
+  appenders:
+    # 控制台Appender，将日志信息输出到控制台
+    console:
+      - # default_console
+        name: default_console
+        target: SYSTEM_OUT
+        patternLayout:
+          pattern: ${patternLayout}
+
+    # 滚动文件Appender，将日志信息输出到日志文件
+    rollingRandomAccessFile:
+      - # default_rolling_file
+        name: default_rolling_file
+        fileName: ${logPath}/${projectName}.log
+        filePattern: "${logPath}/historyLogs/$${date:yyyy-MM}/${projectName}-%d{yyyy-MM-dd}-%i.log.gz"
+        patternLayout:
+          pattern: ${patternLayout}
+        policies:
+          # 指定了基于时间的触发策略
+          timeBasedTriggeringPolicy:
+            #此参数需要与filePattern结合使用，规定了触发rollover的频率，默认值为1。
+            #假设interval为4，若filePattern的date/time pattern的最小时间粒度为小时(如yyyy-MM-dd HH)，则每4小时触发一次rollover；
+            #若filePattern的date/time pattern的最小时间粒度为分钟(如yyyy-MM-dd HH-mm)，则每4分钟触发一次rollover。
+            interval: 1
+            # 指明是否对interval进行调节，默认为false。若modulate为true，会以0为开始对interval进行偏移计算。
+            # 例如，最小时间粒度为小时，当前为3:00，interval为4，则以后触发rollover的时间依次为4:00，8:00，12:00，16:00,...。
+            modulate: true
+        defaultRolloverStrategy:
+          # 文件最大保存数量
+          max: 30
+    # ---------- Kafka-Appender相关配置信息 ----------
+    kafka:
+      - name: default_kafka
+        topic: logs-${projectName}
+        # 目前还没有广泛使用，默认为true，设置为false可以发送消息后立即返回，减少延迟，但是消息可能会丢失，也有可能导致消息顺序错乱
+        syncSend: true # 必须为true，禁止修改！！！
+        patternLayout:
+          # 该配置需与`logstash.conf -> filter:grok`保持一致
+          pattern: "[%date{yyyy-MM-dd HH:mm:ss.SSS}]-[%gserv]-[%ghost]-[%guser]-[%level]-[%X{linkId}]-[%thread]-[%logger] ==> %msg %n"
+        property:
+          - name: bootstrap.servers
+            value: 192.168.2.237:9092
+          - name: max.block.ms # kafka 最大阻塞时间，单位：毫秒
+            value: 60000 # 默认值：60000
+        ignoreExceptions: false # 用于决定是否需要记录在日志事件处理过程中出现的异常，使用Failover Appender时，必须设置为false
+  #     ---------- Kafka-Appender相关配置信息 ----------
+
+  loggers:
+
+    root:
+      level: info
+      additivity: false
+      appenderRef:
+        - ref: default_console # 将日志信息输出到控制台
+        - ref: default_rolling_file # 将日志信息输出到滚动文件
+        - ref: default_kafka # 将日志信息输出到Kafka
