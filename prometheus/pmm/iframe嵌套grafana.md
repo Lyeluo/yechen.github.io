@@ -11,6 +11,10 @@ docker exec -it pmm-server /bin/bash
 [auth.anonymous]
 # enable anonymous access
 enabled = true
+# 允许iframe嵌套
+allow_embedding = true
+# 修改默认主题
+default_theme = light
 ```
 ### 3.修改nginx配置文件
 ```bash
