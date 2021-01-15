@@ -68,7 +68,7 @@ configuration:
         syncSend: true # 必须为true，禁止修改！！！
         patternLayout:
           # 该配置需与`logstash.conf -> filter:grok`保持一致
-          pattern: "[%date{yyyy-MM-dd HH:mm:ss.SSS}]-[%gserv]-[%ghost]-[%guser]-[%level]-[%X{linkId}]-[%thread]-[%logger] ==> %msg %n"
+          pattern: "[%date{yyyy-MM-dd HH:mm:ss.SSS}]-[${serviceName}]-[%ghost]-[%guser]-[%level]-[%X{linkId}]-[%thread]-[%logger] ==> %msg %n"
         property:
           - name: bootstrap.servers
             value: 192.168.2.237:9092

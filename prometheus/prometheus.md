@@ -45,4 +45,3 @@ https://grafana.com/grafana/dashboards
 下载对应的json文件到本地，然后导入grafana  
 最后创建对应的视图，存储选择prometheus即可  
 
-

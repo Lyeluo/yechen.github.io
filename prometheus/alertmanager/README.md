@@ -46,3 +46,14 @@ receivers:
 	html: '{{ template "database.html" . }}'     #应用哪个模板
     headers: { Subject: "[INFO] 报警邮件test" }   #邮件头信息
 ```
+## 企信告警markdown模板
+
+## 【告警】
+- 名称：
+- 级别：
+- 信息：
+- 详情：
+- 告警值：
+- 实例：
+- 实例类型：
+- 故障时间：

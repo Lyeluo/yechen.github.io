@@ -14,5 +14,30 @@ groups:
         annotations:
           # 描述告警概要信息
           summary: "Instance {{ $labels.instance }} down"
-          # 描述告警的详细信息
+          # 描述告警的详细信息，获取触发警报的指标数值使用 {{ $value }}
           description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 5 minutes."
+
+
+
+---
+# prometheus.yml中的配置
+alerting:
+  alertmanagers:
+  - static_configs:
+     - targets:
+        - localhost:9093
+scrape_configs:
+  - job_name: 'consul-node-exporter'
+    consul_sd_configs:
+    - server: '192.168.2.184:8500'
+      services: []
+    ## 修改Prometheus的label
+    relabel_configs:
+    - source_labels: [__meta_consul_tags]
+      regex: .*node-exporter.*
+      action: keep
+      # 使用consul中的变量替换Prometheus的label值，此处是使用prometheus中的__meta_consul_service_id 的值 替换 instance 的值
+      # 查看Prometheus中存储值的方式有 直接访问url http://localhost:9090/api/v1/targets?state=active
+      # 或者访问Prometheus的控制台的Service Discovery 页面
+    - source_labels: [__meta_consul_service_id ]
+      target_label: instance
