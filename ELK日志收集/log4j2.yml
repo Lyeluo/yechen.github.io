@@ -192,6 +192,7 @@ configuration:
           - name: "P_APP_ID"
             pattern: "%MAP{pAppId}"
         filters:
+          # 对应代码记录log时传入的mark参数
           markerFilter:
             marker: "AUDIT_LOG" # ！！！禁止修改！！！
             onMatch: ACCEPT

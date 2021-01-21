@@ -1,0 +1,11 @@
+FROM openjdk:8-jre-slim
+MAINTAINER micro-liujy
+LABEL description="rocketmq-broker"
+ADD rocketmq.tar.gz /opt
+ENV TZ=Asia/Shanghai \
+    NAMESRV=127.0.0.1:9876
+RUN ln -snf /usr/share/zoneinfo/$TZ  /etc/localtime && echo $TZ > /etc/timezone \
+    mkdir -p /opt/rocketmq/store
+EXPOSE 10909
+EXPOSE 10911
+ENTRYPOINT ["sh","-c","/opt/bin/mqbroker -n ${NAMESRV} -c /opt/conf/broker.conf"]

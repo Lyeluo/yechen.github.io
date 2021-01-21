@@ -13,7 +13,8 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-size: "1g"
+        max-size: "200m"
+        max-file: "3"
   mysql:
     image: mysql:5.7
     hostname: "ecs-mysql"
@@ -26,12 +27,15 @@ services:
     volumes:
       - ./mysql/config/my.cnf:/etc/mysql/my.cnf
       - ./mysql/db:/var/lib/mysql
+      # mysql容器会自动初始化docker-entrypoint-initdb.d 目录下的
+      - ./mysql/init-sql:/docker-entrypoint-initdb.d
     ports:
       - 3306:${MYSQL_PORT}
     logging:
       driver: "json-file"
       options:
-        max-size: "1g"
+        max-size: "200m"
+        max-file: "3"
   nginx:
     image: nginx:1.18.0
     hostname: "ecs-nginx"
@@ -39,7 +43,7 @@ services:
     restart: always
     env_file: .env
     volumes:
-      - ./nginx/conf:/etc/nginx
+      - ./nginx/conf/nginx.conf:/etc/nginx/nginx.conf
       - ./nginx/html:/usr/share/nginx/html
       - ./nginx/logs:/var/log/nginx
     ports:
@@ -47,4 +51,46 @@ services:
     logging:
       driver: "json-file"
       options:
-        max-size: "1g"
+        max-size: "200m"
+        max-file: "3"
+  ecs-job:
+    image: ecs-job-center:1.0.8
+    hostname: "ecs-job-center"
+    container_name: ecs-job-center
+    restart: always
+    env_file: .env
+    environment:
+      ECS_CONSOLE_URL: http://ecs:8095/ecs/console/authApi/auth/isAuthorized
+      DB_USERNAME : root
+      DB_URL : mysql:3306
+      DB_PASSWORD : ${MYSQL_ROOT_PASSWORD}
+      ACCESS_TOKEN: ${JOB_CENTER_TOKEN}
+    ports:
+      - 8081:${JOB_CENTER_PORT}
+    depends_on:
+      - mysql
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "3"
+  ecs:
+    image: ecs-boot:latest
+    build:
+      context: ./ecs/build
+    container_name: ecs-boot
+    restart: always
+    # 互相访问地址时，直接采用名称即可，即访问mysql地址为 mysql:3306
+    depends_on:
+      - redis
+      - mysql
+      - ecs-job
+    volumes:
+      - ./ecs/conf/application-dev.yml:/opt/application-dev.yml
+    ports:
+      - ${ECS_PORT_1}:${ECS_PORT_1_MAP}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200m"
+        max-file: "3"

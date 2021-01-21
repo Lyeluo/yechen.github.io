@@ -1,0 +1,45 @@
+version: '3'
+services:
+  mq-namesrv:
+    image: yuanian/rocketmq-namesrv:4.7.1
+    container_name: mq-namesrv
+    ports:
+      - 9876:9876
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
+  mq-broker:
+    image: yuanian/rocketmq-broker:4.7.1
+    container_name: mq-broker
+    ports:
+      - 10909:10909
+      - 10911:10911
+    restart: always
+    environment:
+      NAMESRV: ${NAMESRV}
+    env_file: .env
+    volumes:
+      - ./store:/opt/rocketmq/store
+      - ./conf/broker.conf:/opt/conf/broker.conf
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
+  mq-console:
+    image: 192.168.12.124:7080/ecs-component/yuanian/rocketmq:console-4.7.0
+    container_name: mq-console
+    ports:
+      - 8081:8081
+    restart: always
+    env_file: .env
+    environment:
+      NAMESRV_ADDR: ${NAMESRV}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
