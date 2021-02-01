@@ -74,6 +74,44 @@ services:
       options:
         max-size: "200m"
         max-file: "3"
+  mq-namesrv:
+    image: yuanian/rocketmq-namesrv:4.7.1
+    container_name: mq-namesrv
+    ports:
+      - 9876:9876
+    restart: always
+    environment:
+      SERVER_JVM_XMS: 1g
+      SERVER_JVM_XMX: 1g
+      SERVER_JVM_XMN: 500m
+      SERVER_JVM_METASPACESIZE: 128m
+      SERVER_JVM_MAX_METASPACESIZE: 320m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
+  mq-broker:
+    image: yuanian/rocketmq-broker:4.7.1
+    container_name: mq-broker
+    ports:
+      - 10909:10909
+      - 10911:10911
+    restart: always
+    environment:
+      NAMESRV: ${NAMESRV}
+      BROKER_JVM_XMS: 3g
+      BROKER_JVM_XMX: 3g
+      BROKER_JVM_XMN: 1g
+    env_file: .env
+    volumes:
+      - ./rocketmq/store:/opt/rocketmq/store
+      - ./rocketmq/conf/broker.conf:/opt/conf/broker.conf
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
   ecs:
     image: ecs-boot:latest
     build:
@@ -85,6 +123,8 @@ services:
       - redis
       - mysql
       - ecs-job
+      - mq-namesrv
+      - mq-broker
     volumes:
       - ./ecs/conf/application-dev.yml:/opt/application-dev.yml
     ports:

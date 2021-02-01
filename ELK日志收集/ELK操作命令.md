@@ -75,3 +75,4 @@ sh kafka-console-producer.sh --broker-list localhost:9092 --topic test
 #测试消费消息
 sh kafka-console-consumer.sh --zookeeper 192.168.2.183:2181,192.168.2.184:2181,192.168.2.185:2181 --topic test --from-beginning
 ```
+

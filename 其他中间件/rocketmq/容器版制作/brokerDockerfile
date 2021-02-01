@@ -3,7 +3,10 @@ MAINTAINER micro-liujy
 LABEL description="rocketmq-broker"
 ADD rocketmq.tar.gz /opt
 ENV TZ=Asia/Shanghai \
-    NAMESRV=127.0.0.1:9876
+    NAMESRV=127.0.0.1:9876 \
+    BROKER_JVM_XMS=8g \
+    BROKER_JVM_XMX=8g \
+    BROKER_JVM_XMN=4g
 RUN ln -snf /usr/share/zoneinfo/$TZ  /etc/localtime && echo $TZ > /etc/timezone \
     mkdir -p /opt/rocketmq/store
 EXPOSE 10909

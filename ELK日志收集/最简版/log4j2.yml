@@ -1,6 +1,6 @@
 configuration:
   status: error # log4j2内部日志的日志级别
-  monitorInterval: 3 # 配置扫描间隔
+  monitorInterval: 30 # 配置扫描间隔
   properties:
     property:
       - # 日志路径，用于指定日志文件的存储位置，根据实际情况进行配置
@@ -11,7 +11,7 @@ configuration:
       - # 项目名称，目前固定为ecs2，根据实际情况进行配置
         # 影响范围：日志文件名称，Kafka的Topic
         name: projectName
-        value: exporter
+        value: ${app.log.projectName}
         # 通过启动jar包时 使用 -Dapp.log.serviceName来传值，如：-Dapp.log.serviceName=exporter
       - name: serviceName
         # value: ${sys:app.log.serviceName}
@@ -63,7 +63,7 @@ configuration:
     # ---------- Kafka-Appender相关配置信息 ----------
     kafka:
       - name: default_kafka
-        topic: logs-${projectName}
+        topic: ${projectName}-${serviceName}
         # 目前还没有广泛使用，默认为true，设置为false可以发送消息后立即返回，减少延迟，但是消息可能会丢失，也有可能导致消息顺序错乱
         syncSend: true # 必须为true，禁止修改！！！
         patternLayout:

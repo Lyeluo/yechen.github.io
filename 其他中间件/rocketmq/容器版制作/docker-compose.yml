@@ -6,6 +6,12 @@ services:
     ports:
       - 9876:9876
     restart: always
+    environment:
+      SERVER_JVM_XMS: 4g
+      SERVER_JVM_XMX: 4g
+      SERVER_JVM_XMN: 2g
+      SERVER_JVM_METASPACESIZE: 128m
+      SERVER_JVM_MAX_METASPACESIZE: 320m
     logging:
       driver: "json-file"
       options:
@@ -20,6 +26,9 @@ services:
     restart: always
     environment:
       NAMESRV: ${NAMESRV}
+      BROKER_JVM_XMS: 8g
+      BROKER_JVM_XMX: 8g
+      BROKER_JVM_XMN: 4g
     env_file: .env
     volumes:
       - ./store:/opt/rocketmq/store
