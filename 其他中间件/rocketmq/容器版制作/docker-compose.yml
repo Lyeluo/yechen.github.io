@@ -29,6 +29,7 @@ services:
       BROKER_JVM_XMS: 8g
       BROKER_JVM_XMX: 8g
       BROKER_JVM_XMN: 4g
+      BROCKER_CONF_PATH: /opt/conf/broker.conf
     env_file: .env
     volumes:
       - ./store:/opt/rocketmq/store

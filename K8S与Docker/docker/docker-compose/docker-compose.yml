@@ -9,6 +9,7 @@ services:
     ports:
       - 6379:${REDIS_PORT}
     restart: always
+    command: "--appendonly yes"
     env_file: .env
     logging:
       driver: "json-file"

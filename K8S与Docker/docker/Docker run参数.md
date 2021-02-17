@@ -37,7 +37,8 @@ Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 36.  --restart="no"             指定容器停止后的重启策略:  
 37.                                no：容器退出时不重启    
 38.                                on-failure：容器故障退出（返回值非零）时重启   
-39.                                always：容器退出时总是重启    
+39.                                always：容器退出时总是重启   
+                                   unless-stopped – 不管退出状态码是什么始终重启容器，不过当daemon启动时，如果容器之前已经为停止状态，不要尝试启动它 
 40.  --rm=false                 指定容器停止后自动删除容器(不支持以docker run -d启动的容器)    
 41.  --sig-proxy=true           设置由代理接受并处理信号，但是SIGCHLD、SIGSTOP和SIGKILL不能被代理
 ```

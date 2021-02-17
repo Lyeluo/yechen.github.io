@@ -8,6 +8,8 @@ yum -y remove docker-ce.x86_64
 yum -y remove containerd.io.x86_64
 yum -y remove docker-ce-cli.x86_64
 
+
+yum -y upgrade
 # 安装所需软件包
 yum install -y  yum-utils \
                 device-mapper-persistent-data \
@@ -38,3 +40,7 @@ EOF
 systemctl daemon-reload
 systemctl restart docker
 systemctl enable docker.service
+
+
+
+
