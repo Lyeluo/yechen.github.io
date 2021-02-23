@@ -20,6 +20,7 @@ yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/d
 
 # 安装最新版的docker-ce
 yum -y install docker-ce-$DOCKER_CE_VERSION docker-ce-cli-$DOCKER_CE_CLI_VERSION containerd.io
+yum -y install docker-ce-18.09.6-3.el7 docker-ce-cli-18.09.6-3.el7 containerd.io
 
 # 配置阿里云docker镜像加速器,配置私有镜像仓库地址
 mkdir -p /etc/docker

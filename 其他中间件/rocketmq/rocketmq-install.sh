@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 str=$"\n"
-CURRENT_HOST=$1
+#CURRENT_HOST=$1
+CURRENT_HOST=127.0.0.1
 CURRENT_PATH=$(pwd)
 
 
@@ -52,11 +53,11 @@ function start_new_rocketmq()
     set -o errexit
     echo "安装rocketMQ...开始安装!"
 
-    cp -f ${CURRENT_PATH}/rocketmq-4.7.0/conf/broker.conf ${CURRENT_PATH}/rocketmq-4.7.0/conf/broker-1.conf
-    sed -i "s/192.168.2.187/${CURRENT_HOST}/g" ${CURRENT_PATH}/rocketmq-4.7.0/conf/broker-1.conf
+    cp -f ${CURRENT_PATH}/rocketmq-4.7.1/conf/broker.conf ${CURRENT_PATH}/rocketmq-4.7.1/conf/broker-1.conf
+#    sed -i "s/192.168.2.187/${CURRENT_HOST}/g" ${CURRENT_PATH}/rocketmq-4.7.1/conf/broker-1.conf
 
-    nohup sh ${CURRENT_PATH}/rocketmq-4.7.0/bin/mqnamesrv >${CURRENT_PATH}/rocketmq-4.7.0/log/mqnamesrv.log  2>&1 &
-    nohup sh ${CURRENT_PATH}/rocketmq-4.7.0/bin/mqbroker -n ${CURRENT_HOST}:9876 -c ${CURRENT_PATH}/rocketmq-4.7.0/conf/broker-1.conf >${CURRENT_PATH}/rocketmq-4.7.0/log/broker.log  2>&1 &
+    nohup sh ${CURRENT_PATH}/rocketmq-4.7.1/bin/mqnamesrv >${CURRENT_PATH}/rocketmq-4.7.1/log/mqnamesrv.log  2>&1 &
+    nohup sh ${CURRENT_PATH}/rocketmq-4.7.1/bin/mqbroker -n ${CURRENT_HOST}:9876 -c ${CURRENT_PATH}/rocketmq-4.7.1/conf/broker-1.conf >${CURRENT_PATH}/rocketmq-4.7.1/log/broker.log  2>&1 &
     nohup java -jar ${CURRENT_PATH}/rocketmq-console-ng-1.0.1.jar --rocketmq.config.namesrvAddr="${CURRENT_HOST}:9876"  2>&1 &
 
 }
