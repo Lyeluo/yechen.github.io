@@ -154,3 +154,19 @@ $ mount
 
 ```
 此时已经启动好了。如果实在不放心，可以重启一下客户端的操作系统，之后再查看一下。
+
+
+
+## 卸载nfs
+直接执行以下命令
+```bash
+umount  /mnt/nfs
+```
+如果提示`device is busy`，则需要先把占用的用户干掉
+```bash
+fuser -km /mnt/nfs
+```
+然后再执行umount命令，如果还是执行失败，可以强制执行
+```bash
+umount -f /mnt/nfs
+```

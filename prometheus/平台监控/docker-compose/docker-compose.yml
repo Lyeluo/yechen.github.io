@@ -1,0 +1,85 @@
+version: '3'
+services:
+  prometheus:
+    image: prom/prometheus:v2.23.0
+    hostname: "prometheus"
+    container_name: prometheus
+    ports:
+      - ${PROMETHEUS_PORT}:9090
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - ./prometheus/data:/prometheus
+      - ./prometheus/conf/:/etc/prometheus/
+      - ./prometheus/rules:/opt/rules
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+      - "--storage.tsdb.retention=168h"
+      - "--web.enable-lifecycle"
+    depends_on:
+      - monitor-client
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
+  grafana:
+    image: grafana/grafana:7.3.0
+    hostname: "grafana"
+    container_name: grafana
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${GRAFANA_PORT}:3000
+    volumes:
+      - ./grafana/conf/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/data:/var/lib/grafana
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
+  alertmanager:
+    image: prom/alertmanager:v0.21.0
+    hostname: "alertmanager"
+    container_name: alertmanager
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - ${ALERTMANAGER_PORT}:9093
+    volumes:
+      - ./alertmanager/conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+      - ./alertmanager/data:/alertmanager
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"
+  monitor-client:
+    image: 192.168.12.124:7080/exporter/ecs-monitor-client:1.0
+    hostname: "monitor-client"
+    container_name: ecs-monitor-client
+    restart: always
+    env_file:
+      - .env
+    environment:
+      CONSUL_CONFIG_KEY: ${CONSUL_CONFIG_KEY}
+      CONSUL_ADDR: ${CONSUL_ADDR}
+      CONSUL_PORT: ${CONSUL_PORT}
+      MONITOR_CLIENT_ID: ${MONITOR_CLIENT_ID}
+    ports:
+      - 9011:9011
+    volumes:
+      - ./prometheus/conf:/opt/prometheus/conf
+      - ./monitor/conf/application-dev.yml:/opt/application-dev.yml
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "20m"
+        max-file: "1"

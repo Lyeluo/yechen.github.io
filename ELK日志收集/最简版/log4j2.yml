@@ -11,11 +11,11 @@ configuration:
       - # 项目名称，目前固定为ecs2，根据实际情况进行配置
         # 影响范围：日志文件名称，Kafka的Topic
         name: projectName
-        value: ${app.log.projectName}
+        value: ${sys:app.log.projectName}
         # 通过启动jar包时 使用 -Dapp.log.serviceName来传值，如：-Dapp.log.serviceName=exporter
       - name: serviceName
         # value: ${sys:app.log.serviceName}
-        value: ${app.log.serviceName}
+        value: ${sys:app.log.serviceName}
       - # 格式布局，用于指定记录的日志内容及样式布局
         # ！！！不建议使用[%C or %class, %F or %file, %l or %location, %L or %line, %M or %method]，性能开销太大！！！
         # 支持以下自定义转换参数
@@ -38,7 +38,6 @@ configuration:
         target: SYSTEM_OUT
         patternLayout:
           pattern: ${patternLayout}
-
     # 滚动文件Appender，将日志信息输出到日志文件
     rollingRandomAccessFile:
       - # default_rolling_file
@@ -75,14 +74,31 @@ configuration:
           - name: max.block.ms # kafka 最大阻塞时间，单位：毫秒
             value: 60000 # 默认值：60000
         ignoreExceptions: false # 用于决定是否需要记录在日志事件处理过程中出现的异常，使用Failover Appender时，必须设置为false
-  #     ---------- Kafka-Appender相关配置信息 ----------
+    # 故障转译 如果输出日志到kafka失败则直接输出到控制台
+    failover:
+      - name: failover
+        primary: default_kafka
+        # retryIntervalSeconds重试主appender ‘default_kafka’距离上次失败的时间
+        retryIntervalSeconds: 60
+        Failovers:
+          appenderRef:
+            - ref: default_console
+
 
   loggers:
-
+    logger:
+      - # 以com开头的logger
+        name: com
+        level: info
+        # 扫描到子包中打印的日志后，父包是否还要打印
+        additivity: false
+        appenderRef:
+          - ref: failover # 将日志信息输出到Kafka
     root:
       level: info
       additivity: false
       appenderRef:
         - ref: default_console # 将日志信息输出到控制台
         - ref: default_rolling_file # 将日志信息输出到滚动文件
-        - ref: default_kafka # 将日志信息输出到Kafka
+
+

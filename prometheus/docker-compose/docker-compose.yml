@@ -5,7 +5,7 @@ services:
     hostname: "prometheus"
     container_name: prometheus
     ports:
-      - 9090:9090
+      - ${PROMETHEUS_PORT}:9090
     restart: always
     volumes:
       - ./prometheus/data:/prometheus
@@ -29,7 +29,7 @@ services:
     container_name: grafana
     restart: always
     ports:
-      - 3000:3000
+      - ${GRAFANA_PORT}:3000
     volumes:
       - ./grafana/conf/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/data:/var/lib/grafana
@@ -44,7 +44,7 @@ services:
     container_name: alertmanager
     restart: always
     ports:
-      - 9093:9093
+      - ${ALERTMANAGER_PORT}:9093
     volumes:
       - ./alertmanager/conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml
       - ./alertmanager/data:/alertmanager
@@ -59,7 +59,7 @@ services:
     container_name: consul
     restart: always
     ports:
-      - 8500:8500
+      - ${CONSUL_PORT}:8500
     volumes:
       - ./consul/data:/consul/data
     logging:

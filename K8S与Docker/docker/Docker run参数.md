@@ -6,7 +6,7 @@ Usage: docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 05.  -t, --tty=false            分配tty设备，该可以支持终端登录，默认为false    
 06.  -u, --user=""              指定容器的用户    
 07.  -a, --attach=[]            登录容器（必须是以docker run -d启动的容器）  
-08.  -w, --workdir=""           指定容器的工作目录   
+08.  -w, --workdir=""           指定容器的工作目录(覆盖Dockerfile中的 Workdir指令)  
 09.  -c, --cpu-shares=0        设置容器CPU权重，在CPU共享场景使用    
 10.  -e, --env=[]               指定环境变量，容器中可以使用该环境变量    
 11.  -m, --memory=""            指定容器的内存上限    

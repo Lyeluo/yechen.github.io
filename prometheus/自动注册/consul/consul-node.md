@@ -42,11 +42,16 @@ prometheus.yml配置
       consul_sd_configs:
       - server: '192.168.2.184:8500'
         services: []
-      relabel_configs:
+      relabel_configs:ho
       - source_labels: [__meta_consul_tags]
         regex: .*node-exporter.*
         action: keep
       - source_labels: [ __meta__consul_service ]
         target_label: instance
 
+```
+部署一个consul-server，同时启动consul配置中心的持久化
+```bash
+docker run -d --name consul --restart=always -v  `pwd`/consul/data:/consul/data \
+ -v  `pwd`/consul/config:/consul/config -p 8500:8500 consul agent -server -ui -client=0.0.0.0 -bootstrap-expect=1
 ```
