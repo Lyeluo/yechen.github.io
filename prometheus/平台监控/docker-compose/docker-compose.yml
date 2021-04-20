@@ -53,6 +53,8 @@ services:
       - .env
     ports:
       - ${ALERTMANAGER_PORT}:9093
+    environment:
+      ALERT_PATH: 192.168.12.49
     volumes:
       - ./alertmanager/conf/alertmanager.yml:/etc/alertmanager/alertmanager.yml
       - ./alertmanager/data:/alertmanager
@@ -77,6 +79,7 @@ services:
       - 9011:9011
     volumes:
       - ./prometheus/conf:/opt/prometheus/conf
+      - ./prometheus/rules:/opt/prometheus/rules
       - ./monitor/conf/application-dev.yml:/opt/application-dev.yml
     logging:
       driver: "json-file"

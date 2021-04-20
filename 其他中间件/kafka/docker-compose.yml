@@ -24,9 +24,9 @@ services:
       - ./kafka-logs:/kafka
     depends_on:
       - zookeeper
-  kafka-manager:
-    image: sheepkiller/kafka-manager              # 镜像：开源的web管理kafka集群的界面
-    environment:
-      ZK_HOSTS: 192.168.2.237                  # 修改:宿主机IP
-    ports:
-      - 9000:9000                              # 暴露端口
+#  kafka-manager:
+#    image: sheepkiller/kafka-manager              # 镜像：开源的web管理kafka集群的界面
+#    environment:
+#      ZK_HOSTS: 192.168.2.237                  # 修改:宿主机IP
+#    ports:
+#      - 9000:9000                              # 暴露端口

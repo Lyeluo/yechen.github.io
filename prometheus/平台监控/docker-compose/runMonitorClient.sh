@@ -4,23 +4,34 @@ PROMETHEUS_PORT=9090
 GRAFANA_PORT=3000
 ALERTMANAGER_PORT=9093
 
-
 /bin/cp -rf ./clientEnv ./.env
 
-while getopts ":k:a:s:p:h" optname
+while getopts ":k:a:s:p:m:c:h" optname
 do
     case "$optname" in
       "k")
+       echo "consul的configKey为：$OPTARG"
        sed -i "s,CONSUL_CONFIG_KEY_VALUE_VALUE,$OPTARG,g" ./.env
         ;;
       "a")
+        echo "consul的ip为：$OPTARG"
         sed -i "s,CONSUL_ADDR_VALUE,$OPTARG,g" ./.env
         ;;
       "p")
+        echo "consul的port为：$OPTARG"
         sed -i "s,CONSUL_PORT_VALUE,$OPTARG,g" ./.env
         ;;
       "s")
+        echo "注册到的consul的id为：$OPTARG"
         sed -i "s,MONITOR_CLIENT_ID_VALUE,$OPTARG,g" ./.env
+        ;;
+      "m")
+        echo "代理端的地址为：$OPTARG"
+        sed -i "s,LOCAL_IP_VALUE,$OPTARG,g" ./.env
+        ;;
+      "c")
+        echo "监控中心的地址为：$OPTARG"
+        sed -i "s,MONITOR_CENTER_HOST,$OPTARG,g" ./alertmanager/conf/alertmanager.yml
         ;;
       "h")
         echo "get option -h,eg:./test.sh -consul-key prometheus -consul-addr 192.168.2.184:8500"

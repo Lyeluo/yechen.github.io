@@ -1,0 +1,169 @@
+
+kubectl apply -f - <<EOF
+#构建内部账号
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: snake-admin-sa-svc
+  namespace: renbao
+---
+#自定义secret与sa绑定
+apiVersion: v1
+kind: Secret
+metadata:
+  name: snake-admin-sa-svc
+  namespace: renbao
+  annotations:
+    kubernetes.io/service-account.name: snake-admin-sa-svc
+type: kubernetes.io/service-account-token
+---
+#构建一个集群级别的角色,给与读取权限
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: snake-admin-svc-cr
+rules:
+- apiGroups:
+  - ""
+  resources: ["*"]
+  verbs:
+  - get
+  - list
+  - watch
+---
+#将角色与账号绑定
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: snake-admin-svc-crb
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: snake-admin-svc-cr
+subjects:
+- kind: ServiceAccount
+  name: snake-admin-sa-svc
+  namespace: renbao
+EOF
+
+
+#将账权限绑定至pod中
+kubectl apply -f - <<EOF
+#应用
+kind: Deployment
+apiVersion: apps/v1beta1
+metadata:
+  #名称
+  name: centos-call-k8sapi-demo
+  #命名空间
+  namespace: renbao
+spec:
+  #配置标记k8s1.16必填
+  selector:
+    matchLabels:
+      app: centos-call-k8sapi-demo
+  #启动应用数量
+  replicas: 1
+  #从容器启动到应用正常提供服务
+  minReadySeconds: 10
+  #策略
+  strategy:
+    #更新类型
+    type: RollingUpdate
+    #滚动更新
+    rollingUpdate:
+      #更新时允许最大激增的容器数
+      maxSurge: 1
+      #更新时允许最大 unavailable 容器数
+      maxUnavailable: 0
+  #模板
+  template:
+    #数据描述[元数据]
+    metadata:
+      #标签
+      labels:
+        #应用
+        app: centos-call-k8sapi-demo
+    #规格
+    spec:
+      #容器
+      containers:
+        #名称
+      - name: centos-call-k8sapi-demo
+        #镜像
+        image: uhub.service.ucloud.cn/pub021/centos:7.4.1708
+        #镜像挂载目录
+        volumeMounts:
+        - name: time
+          mountPath: /etc/localtime
+          #挂载sa的secret
+        - name: snake-admin-sa-svc-token
+          mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        #以终端方式运行
+        tty: true
+        #计算资源配置
+        resources:
+          #启动限制
+          requests:
+            #初始化CPU用量
+            cpu: "100m"
+            #初始化内存用量
+            memory: "128Mi"
+          #最大限制
+          limits:
+            #限制CPU最大用量
+            cpu: "100m"
+            #限制内存最大用量
+            memory: "128Mi"
+      #实际目录挂载
+      volumes:
+      #宿主机时间文件
+      - name: time
+        hostPath:
+          path: /etc/localtime
+      #挂载sa的secret
+      - name: snake-admin-sa-svc-token
+        secret:
+          defaultMode: 420
+          secretName: snake-admin-sa-svc
+EOF
+
+#进入对应目录
+cd /var/run/secrets/kubernetes.io/serviceaccount
+#
+curl -v --cacert ./ca.crt https://kubernetes.default/apis -H "Authorization:Bearer $(cat ./token)"
+
+#命名空间列表
+curl -v --cacert ./ca.crt https://kubernetes.default/api/v1/namespaces -H "Authorization:Bearer $(cat ./token)"
+
+#全部service /api/v1/watch/services
+curl -v --cacert ./ca.crt https://kubernetes.default/api/v1/watch/services -H "Authorization:Bearer $(cat ./token)"
+
+#svc列表 /api/v1/watch/namespaces/{namespace}/services
+curl -v --cacert ./ca.crt --no-keepalive https://kubernetes.default/api/v1/watch/namespaces/renbao/services -H "Authorization:Bearer $(cat ./token)"
+
+
+###################删除
+kubectl delete -f- <<EOF
+#构建内部账号
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: snake-admin-sa-svc
+  namespace: renbao
+---
+#构建一个集群规则
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: snake-admin-svc-cr
+---
+#将规则与账号绑定
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: snake-admin-svc-crb
+EOF
+###################删除
+
+Transfer-Encoding: chunked

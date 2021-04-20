@@ -94,6 +94,7 @@ configuration:
         additivity: false
         appenderRef:
           - ref: failover # 将日志信息输出到Kafka
+          - ref: default_rolling_file # 将日志信息输出到滚动文件
     root:
       level: info
       additivity: false

@@ -1,0 +1,32 @@
+{
+  "receiver":"c-2a3bc:kube-components-alert",
+  "status":"firing",
+  "alerts":[
+    {
+      "status":"firing",
+      "labels":{
+        "alert_name":"Scheduler is unavailable",
+        "alert_type":"systemService",
+        "cluster_name":"mycluster (ID: c-2a3bc)",
+        "component_name":"scheduler",
+        "group_id":"c-2a3bc:kube-components-alert",
+        "logs":"Get http://127.0.0.1:10251/healthz: dial tcp 127.0.0.1:10251: connect: connection refused",
+        "rule_id":"c-2a3bc:kube-components-alert_scheduler-system-service",
+        "severity":"critical"
+      },
+      "annotations":{},
+      "startsAt":"2020-01-30T19:18:13.321684733Z",
+      "endsAt":"0001-01-01T00:00:00Z",
+      "generatorURL":""
+    }
+  ],
+  "groupLabels":{
+    "component_name":"scheduler",
+    "rule_id":"c-2a3bc:kube-components-alert_scheduler-system-service"
+  },
+  "commonLabels":{
+    "alert_name":"Scheduler is unavailable",
+    "alert_type":"systemService",
+    "cluster_name":"mycluster (ID: c-2a3bc)"
+  }
+}
