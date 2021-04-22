@@ -12,5 +12,5 @@ RUN ln -snf /usr/share/zoneinfo/$TZ  /etc/localtime && echo $TZ > /etc/timezone 
     mkdir -p /opt/rocketmq/store
 EXPOSE 10909
 EXPOSE 10911
+VOLUME /opt/rocketmq/store
 ENTRYPOINT ["sh","-c","/opt/bin/mqbroker -n ${NAMESRV} -c ${BROCKER_CONF_PATH}"]
-export NAMESRV_ADDR=rocket-namesrv:9876
