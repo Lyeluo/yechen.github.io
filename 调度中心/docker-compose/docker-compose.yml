@@ -1,7 +1,7 @@
 version: '3'
 services:
   redis:
-    image: ecs-redis:${REDIS_VERSION}
+    image: ecs-redis:6.0
     hostname: "ecs-redis"
     container_name: ecs-redis
     volumes:
@@ -75,44 +75,6 @@ services:
       options:
         max-size: "200m"
         max-file: "3"
-  mq-namesrv:
-    image: yuanian/rocketmq-namesrv:4.7.1
-    container_name: mq-namesrv
-    ports:
-      - 9876:9876
-    restart: always
-    environment:
-      SERVER_JVM_XMS: 1g
-      SERVER_JVM_XMX: 1g
-      SERVER_JVM_XMN: 500m
-      SERVER_JVM_METASPACESIZE: 128m
-      SERVER_JVM_MAX_METASPACESIZE: 320m
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "20m"
-        max-file: "1"
-  mq-broker:
-    image: yuanian/rocketmq-broker:4.7.1
-    container_name: mq-broker
-    ports:
-      - 10909:10909
-      - 10911:10911
-    restart: always
-    environment:
-      NAMESRV: ${NAMESRV}
-      BROKER_JVM_XMS: 3g
-      BROKER_JVM_XMX: 3g
-      BROKER_JVM_XMN: 1g
-    env_file: .env
-    volumes:
-      - ./rocketmq/store:/opt/rocketmq/store
-      - ./rocketmq/conf/broker.conf:/opt/conf/broker.conf
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "20m"
-        max-file: "1"
   metadata:
     image: ecs-metadata:latest
     build:
@@ -129,17 +91,18 @@ services:
       context: ./ecs/build
     container_name: ecs-boot
     restart: always
+    environment:
+      JAVA_OPT: -Xmx1024m -Xms1024m -XX:MaxMetaspaceSize=512M -XX:MetaspaceSize=256M -Dfile.encoding=utf-8 -Xdebug -Xrunjdwp:transport=dt_socket,suspend=n,server=y,address=8096
     # 互相访问地址时，直接采用名称即可，即访问mysql地址为 mysql:3306
     depends_on:
       - redis
       - ecs-job
-      - mq-namesrv
-      - mq-broker
       - metadata
     volumes:
       - ./ecs/conf/application-dev.yml:/opt/application-dev.yml
     ports:
       - ${ECS_PORT_1_MAP}:${ECS_PORT_1}
+      - 8096:8096
     logging:
       driver: "json-file"
       options:

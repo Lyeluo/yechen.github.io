@@ -170,3 +170,19 @@ fuser -km /mnt/nfs
 ```bash
 umount -f /mnt/nfs
 ```
+## 报错
+### 1. Failed to start nfs.service: Transaction order is cyclic
+原因：挂载目录时误操作，在nfs-server挂载了同一个目录  
+处理方式：修改 /run/systemd/generator/nfs-server.service.d目录下的`order-with-mounts.conf`文件  
+重新加载系统配置
+```bash
+systemctl daemon-reload
+```
+查看状态
+```bash
+systemctl status nfs-serve
+```
+重启
+```bash
+systemctl restart nfs-serve
+```

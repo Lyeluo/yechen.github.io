@@ -123,10 +123,33 @@ Commands:
 ```bash
 docker volume rm $(sudo docker volume ls -q)
 ```
+根据一个容器的挂载文件创建另一个容器，只是为了挂载使用
+```bash
+docker create --volumes-from <RANCHER_CONTAINER_NAME> --name rancher-data rancher/rancher:<RANCHER_CONTAINER_TAG>
+```
+使用之前的挂载容器,获取容器的挂载文件作为新容器的挂载文件
+```bash
+docker run -d --privileged --volumes-from rancher-data \
+  --restart=unless-stopped \
+  -p 80:80 -p 443:443 \
+    rancher/rancher:<RANCHER_VERSION_TAG>
+```
 
 11.存储镜像到tar.gz
 ```bash
 docker save danielqsj/kafka-exporter:latest | gzip > kafka-exporter.tar.gz
+```
+使用docker save存储的镜像 需要使用docker load加载
+```bash
+docker load -i kafka-exporter.tar.gz
+```
+11.5 存储容器到tar.gz
+```bash
+docker export -o kafka-exporter.tar.gz danielqsj/kafka-exporter:latest
+```
+使用 docker export导出的镜像，需要使用docker import导入,导入时可以重新指定镜像名称
+```bash
+docker import kafka-exporter.tar.gz kafka-exporter:latest
 ```
 12.查看容器状态
 ```bash

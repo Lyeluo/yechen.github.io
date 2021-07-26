@@ -210,6 +210,7 @@ mkdir /root/.kube
 cp -i /etc/kubernetes/admin.conf /root/.kube/config
 
 # 分发配置文件到各 Node 节点（让 Node 节点使用 `kubectl`）
+
 scp /etc/kubernetes/admin.conf KubernetesNode1:/root/.kube/config
 scp /etc/kubernetes/admin.conf KubernetesNode2:/root/.kube/config
 ```

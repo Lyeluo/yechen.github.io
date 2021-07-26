@@ -1,0 +1,93 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mq-broker
+spec:
+  selector:
+    app: mq-broker
+  ports:
+    - port: 30911
+      targetPort: "broker-port"
+      name: broker-port
+    - port: 30909
+      targetPort: "broker-vip-port"
+      name: broker-vip-port
+  type: ClusterIP
+  externalIPs:
+    - 192.168.12.96
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mq-broker
+  labels:
+    app: mq-broker
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: mq-broker
+      labels:
+        app: mq-broker
+    spec:
+      volumes:
+        - name: conf
+          configMap:
+            name: broker-conf
+            items:
+              - key: broker.conf
+                path: broker.conf
+      containers:
+        - name: mq-broker
+          image: 192.168.12.124:7080/ecs-component/yuanian/rocketmq:broker-4.7.1
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: conf
+              # 注意：使用cm挂载时，会将整个目录覆盖掉，所以要使用独立文件来进行挂载
+              mountPath: /opt/mq/mq-broker
+          env:
+            - name: NAMESRV
+              value: "192.168.2.184:9876"
+            - name: BROKER_JVM_XMS
+              value: "8g"
+            - name: BROKER_JVM_XMX
+              value: "8g"
+            - name: BROKER_JVM_XMN
+              value: "4g"
+            - name: BROCKER_CONF_PATH
+              value: "/opt/mq/mq-broker/broker.conf"
+          ports:
+            - containerPort: 10911
+              name: broker-port
+            - containerPort: 10909
+              name: broker-vip-port
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: mq-broker
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: broker-conf
+data:
+  broker.conf: |
+  brokerClusterName=DefaultCluster
+  brokerName=broker-a
+  brokerId=0
+  deleteWhen=04
+  fileReservedTime=24
+  autoCreateTopicEnable=true
+  brokerRole=ASYNC_MASTER
+  flushDiskType=SYNC_FLUSH
+  syncFlushTimeout=10000
+  brokerIP1=192.168.12.96
+  listenPort=30911
+  storePathRootDir=/opt/rocketmq/store
+  storePathCommitLog=/opt/rocketmq/store/commitlog
+  storePathConsumeQueue=/opt/rocketmq/store/consumequeue
+  storePathIndex=/opt/rocketmq/store/index
+  storeCheckpoint=/opt/rocketmq/store/checkpoint
+  abortFile=/opt/rocketmq/store/abort
+
+

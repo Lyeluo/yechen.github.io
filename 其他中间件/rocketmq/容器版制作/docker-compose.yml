@@ -3,6 +3,7 @@ services:
   mq-namesrv:
     image: yuanian/rocketmq-namesrv:4.7.1
     container_name: mq-namesrv
+    network_mode:
     ports:
       - 9876:9876
     restart: always
