@@ -1,0 +1,214 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: broker-conf
+data:
+  broker.conf: |
+    brokerClusterName=DefaultCluster
+    brokerName=broker-a
+    brokerId=0
+    deleteWhen=04
+    fileReservedTime=24
+    autoCreateTopicEnable=true
+    brokerRole=ASYNC_MASTER
+    flushDiskType=SYNC_FLUSH
+    syncFlushTimeout=10000
+    brokerIP1=192.168.12.96
+    listenPort=30911
+    storePathRootDir=/opt/rocketmq/store
+    storePathCommitLog=/opt/rocketmq/store/commitlog
+    storePathConsumeQueue=/opt/rocketmq/store/consumequeue
+    storePathIndex=/opt/rocketmq/store/index
+    storeCheckpoint=/opt/rocketmq/store/checkpoint
+    abortFile=/opt/rocketmq/store/abort
+---
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  namespace: rocketmq
+  name: mq-namesrv
+  labels:
+    app: mq-namesrv
+spec:
+  replicas: 1
+  serviceName: mq-namesrv
+  selector:
+    matchLabels:
+      app: mq-namesrv
+  template:
+    metadata:
+      labels:
+        app: mq-namesrv
+    spec:
+      containers:
+        - image: 192.168.12.124:7080/ecs-component/yuanian/rocketmq:namesrv-4.7.1
+          imagePullPolicy: Always
+          name: namesrv
+          ports:
+            - protocol: TCP
+              containerPort: 9876
+          env:
+            - name: SERVER_JVM_XMS
+              value: 1g
+            - name: SERVER_JVM_XMX
+              value: 1g
+            - name: SERVER_JVM_XMN
+              value: 500m
+          readinessProbe:
+            tcpSocket:
+              port: 10909
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: 10909
+            initialDelaySeconds: 120
+            periodSeconds: 10
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: rocketmq
+  name: mq-namesrv
+  labels:
+    app: mq-namesrv
+spec:
+  ports:
+    - name: rocketmq-port-9876
+      protocol: TCP
+      port: 39876
+      targetPort: 9876
+  selector:
+    app: mq-namesrv
+  type: ClusterIP
+  externalIPs:
+    - 192.168.12.96
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mq-broker
+  namespace: rocketmq
+  labels:
+    app: mq-broker
+spec:
+  replicas: 1
+  serviceName: mq-broker
+  template:
+    metadata:
+      name: mq-broker
+      labels:
+        app: mq-broker
+    spec:
+      volumes:
+        - name: conf
+          configMap:
+            name: broker-conf
+            items:
+              - key: broker.conf
+                path: broker.conf
+      containers:
+        - name: mq-broker
+          image: 192.168.12.124:7080/ecs-component/yuanian/rocketmq:broker-4.7.1
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: conf
+              # 注意：使用cm挂载时，会将整个目录覆盖掉，所以要使用独立文件来进行挂载
+              mountPath: /opt/mq/mq-broker
+          env:
+            - name: NAMESRV
+              value: "mq-namesrv-0.mq-namesrv.rocketmq:9876"
+            - name: BROKER_JVM_XMS
+              value: "8g"
+            - name: BROKER_JVM_XMX
+              value: "8g"
+            - name: BROKER_JVM_XMN
+              value: "4g"
+            - name: BROCKER_CONF_PATH
+              value: "/opt/mq/mq-broker/broker.conf"
+          ports:
+            - containerPort: 30911
+              name: broker-port
+            - containerPort: 30909
+              name: broker-vip-port
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: mq-broker
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: rocketmq
+  name: mq-broker
+  labels:
+    app: mq-broker
+spec:
+  ports:
+    - name: rocketmq-port-30909
+      protocol: TCP
+      port: 30909
+      targetPort: 30909
+    - name: rocketmq-port-30911
+      protocol: TCP
+      port: 30911
+      targetPort: 30911
+  selector:
+    app: mq-broker
+  type: ClusterIP
+  externalIPs:
+    - 192.168.12.96
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mq-console
+  namespace: rocketmq
+  labels:
+    app: mq-console
+spec:
+  replicas: 1
+  serviceName: mq-console
+  template:
+    metadata:
+      name: mq-console
+      labels:
+        app: mq-console
+    spec:
+      containers:
+        - name: mq-console
+          image: 192.168.12.124:7080/ecs-component/yuanian/rocketmq-new:console-4.7.0
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: NAMESRV_ADDR
+              value: "mq-namesrv-0.mq-namesrv.rocketmq:9876"
+            - name: MQ_CAL_OPT
+              value: " --rocketmq.config.loginRequired=true  --rocketmq.config.loginName=admin --rocketmq.config.password=admin"
+          ports:
+            - containerPort: 8081
+              name: broker-port
+      restartPolicy: Always
+  volumeClaimTemplates:
+    -
+  selector:
+    matchLabels:
+      app: mq-console
+---
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: rocketmq
+  name: mq-console
+  labels:
+    app: mq-console
+spec:
+  ports:
+    - name: rocketmq-port-8081
+      protocol: TCP
+      port: 38081
+      targetPort: 8081
+  selector:
+    app: mq-console
+  type: ClusterIP
+  externalIPs:
+    - 192.168.12.96

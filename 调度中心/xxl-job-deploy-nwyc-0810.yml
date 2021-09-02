@@ -1,0 +1,166 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: ecs-console-nginx
+  namespace: xxljob-yc-yz
+  labels:
+    app: ecs-console-nginx
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: ecs-console-nginx
+      labels:
+        app: ecs-console-nginx
+    spec:
+      imagePullSecrets:
+        - name : ykb
+        - name : aliyun
+      containers:
+        - name: ecs-console-nginx
+          image: 192.168.58.120/ecs2/ecs-console-nginx:yc20210705001
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: time
+              mountPath: /etc/localtime
+      restartPolicy: Always
+      volumes:
+        - name: time
+          hostPath:
+            path: /etc/localtime
+  selector:
+    matchLabels:
+      app: ecs-console-nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecs-console-nginx
+  namespace: xxljob-yc-yz
+spec:
+  selector:
+    app: ecs-console-nginx
+  ports:
+    - name: http
+      port: 12620
+      protocol: TCP
+      targetPort: 80
+  type: ClusterIP
+  externalIPs: [192.168.48.185]
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: ecs-job-center
+  namespace: xxljob-yc-yz
+  labels:
+    app: ecs-job-center
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: ecs-job-center
+      labels:
+        app: ecs-job-center
+    spec:
+      imagePullSecrets:
+        - name : ykb
+        - name : aliyun
+      containers:
+        - name: ecs-job-center
+          image: 192.168.58.120/ecs2/ecs-job-center:20210812002
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: ECS_CONSOLE_URL
+              value: /console/console/authApi/auth/isAuthorized
+            - name: DB_USERNAME
+              value: root
+            - name: DB_URL
+              value: 192.168.61.21:6033,192.168.61.22:6033,192.168.61.23:6033
+            - name: DB_PASSWORD
+              value: "Noahark@8225"
+            - name: ACCESS_TOKEN
+              value: ms-yuanian
+            - name: JAVA_PARAM
+              value: --server.tomcat.max-threads=5000 --xxl.job.minRemainingCapacity=250
+      restartPolicy: Always
+  selector:
+    matchLabels:
+      app: ecs-job-center
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecs-job
+  namespace: xxljob-yc-yz
+spec:
+  selector:
+    app: ecs-job-center
+  ports:
+    - name: http
+      port: 12621
+      protocol: TCP
+      targetPort: 8081
+  type: ClusterIP
+  externalIPs: [192.168.48.185]
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: ecs-console
+  namespace: xxljob-yc-yz
+  labels:
+    app: ecs-console
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: ecs-console
+      labels:
+        app: ecs-console
+    spec:
+      imagePullSecrets:
+        - name : ykb
+        - name : aliyun
+      containers:
+        - name: ecs-console
+          image: 192.168.58.120/ecs2/ecs-console:v1
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8095
+          env:
+            - name: JAVA_PARAM
+              value: "--spring.redis.host=192.168.58.125 --spring.datasource.url=jdbc:mysql://192.168.61.22:6033,192.168.61.21:6033,192.168.61.23:6033/xxljob?useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true&serverTimezone=Asia/Shanghai --spring.datasource.username=root --spring.datasource.password=Noahark@8225 --yn.job.admin.addresses=http://ecs-job:12521/xxl-job-admin"
+            - name: JAVA_OPT
+              value: "-Xmx1024m -Xms1024m -XX:MaxMetaspaceSize=512M -XX:MetaspaceSize=256M -Dfile.encoding=utf-8 -Duser.timezone=GMT+8"
+          volumeMounts:
+            - name: time
+              mountPath: /etc/localtime
+      restartPolicy: Always
+      volumes:
+        - name: time
+          hostPath:
+            path: /etc/localtime
+  selector:
+    matchLabels:
+      app: ecs-console
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ecs
+  namespace: xxljob-yc-yz
+spec:
+  selector:
+    app: ecs-console
+  ports:
+    - name: http
+      port: 12622
+      protocol: TCP
+      targetPort: 8095
+  type: ClusterIP
+  externalIPs: [192.168.48.185]

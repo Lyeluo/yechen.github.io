@@ -248,5 +248,13 @@ kubectl rollout status deployment.v1.apps/nginx-deployment
 # kubectl replace 根据原有资源的json/yml进行变更，会删除原有pod重新创建一个pod
 # 用法如下
 kubectl get pod test-85fd7c9b44-9jjqm -o yaml -n ecs-dev | sed 's/\(image: redis\):.*$/\1:5.0/' | kubectl replace --force -f -
-
+```
+## 驱逐kubernetes的节点
+停止调度pod到该节点上
+```bash
+kubectl cordon $NODENAME
+```
+驱散节点上的所有pod
+```bash
+kubectl drain $NODENAME --delete-local-data --ignore-daemonsets --force
 ```

@@ -1,0 +1,83 @@
+##########命名空间级别控制##########
+##########outboundTrafficPolicy模式为REGISTRY_ONLY(仅注册)
+
+#命名空间范围内互访
+kubectl apply -f - <<EOF
+apiVersion: networking.istio.io/v1alpha3
+kind: Sidecar
+metadata:
+  name: default
+  namespace: base
+spec:
+  egress:
+  - hosts:
+    - "./*"
+EOF
+
+#命名空间范围内和命名空间外部服务
+kubectl apply -f - <<EOF
+apiVersion: networking.istio.io/v1alpha3
+kind: Sidecar
+metadata:
+  name: default
+  namespace: base
+spec:
+  egress:
+  - hosts:
+    - "./*"
+    - "demo/k8s-undertow-jfinal-mvn.demo.svc.cluster.local"
+    - "demo/mysql.demo.svc.cluster.local"
+EOF
+
+kubectl delete sidecar default -n base
+
+##########应用级别控制##########
+
+#命名空间范围内访问
+kubectl apply -f - <<EOF
+apiVersion: networking.istio.io/v1alpha3
+kind: Sidecar
+metadata:
+  name: ykb-centos
+  namespace: base
+spec:
+  #增加工作台选择器将控制范围缩小到指定的应用
+  workloadSelector:
+    labels:
+      app: ykb-centos
+  egress:
+  - hosts:
+    - "./*"
+EOF
+
+#命名空间范围内和命名空间外部服务
+kubectl apply -f - <<EOF
+apiVersion: networking.istio.io/v1alpha3
+kind: Sidecar
+metadata:
+  name: ykb-centos
+  namespace: base
+spec:
+  #增加工作台选择器将控制范围缩小到指定的应用
+  workloadSelector:
+    labels:
+      app: ykb-centos
+  egress:
+  - hosts:
+    - "./*"
+    - "demo/k8s-undertow-jfinal-mvn.demo.svc.cluster.local"
+    - "demo/mysql.demo.svc.cluster.local"
+EOF
+
+kubectl delete sidecar ykb-centos -n base
+
+
+#命令
+#访问web
+curl http://ykb-httpd-a.base:14000
+
+curl http://k8s-undertow-jfinal-mvn.demo:12467
+
+#访问mysql
+mysql -hmysql.demo -uroot -pk3sroot
+

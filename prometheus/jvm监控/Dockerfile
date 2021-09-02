@@ -6,4 +6,3 @@ ENV TZ=Asia/Shanghai\
 RUN ln -snf /usr/share/zoneinfo/$TZ  /etc/localtime && echo $TZ > /etc/timezone \
      && sed -i "s/deb.debian.org/mirrors.aliyun.com/g" /etc/apt/sources.list && apt-get clean \
      && apt-get -y update && apt-get -y install libfreetype6 && apt-get -y install fontconfig
-
