@@ -441,12 +441,12 @@ spec:
               value: 500m
           readinessProbe:
             tcpSocket:
-              port: 10909
+              port: 9876
             initialDelaySeconds: 10
             periodSeconds: 5
           livenessProbe:
             tcpSocket:
-              port: 10909
+              port: 9876
             initialDelaySeconds: 120
             periodSeconds: 10
 ---

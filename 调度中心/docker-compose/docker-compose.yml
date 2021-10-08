@@ -99,7 +99,7 @@ services:
       - ecs-job
       - metadata
     volumes:
-      - ./ecs/conf/application-dev.yml:/opt/application-dev.yml
+      - ./ecs/conf/cloud_application-dev.yml:/opt/cloud_application-dev.yml
     ports:
       - ${ECS_PORT_1_MAP}:${ECS_PORT_1}
       - 8096:8096

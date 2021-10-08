@@ -80,7 +80,7 @@ services:
     volumes:
       - ./prometheus/conf:/opt/prometheus/conf
       - ./prometheus/rules:/opt/prometheus/rules
-      - ./monitor/conf/application-dev.yml:/opt/application-dev.yml
+      - ./monitor/conf/cloud_application-dev.yml:/opt/cloud_application-dev.yml
     logging:
       driver: "json-file"
       options:

@@ -249,6 +249,10 @@ kubectl rollout status deployment.v1.apps/nginx-deployment
 # 用法如下
 kubectl get pod test-85fd7c9b44-9jjqm -o yaml -n ecs-dev | sed 's/\(image: redis\):.*$/\1:5.0/' | kubectl replace --force -f -
 ```
+创建镜像拉取秘钥
+```bash
+kubectl create secret docker-registry ykb --docker-server=192.168.58.120 --docker-username=admin --docker-password=admin --docker-email=admin@yn.com -n ecs2-mysql-cloudtest
+```
 ## 驱逐kubernetes的节点
 停止调度pod到该节点上
 ```bash
