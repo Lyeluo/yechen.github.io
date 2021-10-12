@@ -330,3 +330,120 @@ pull模式：客户端不断的轮询请求服务端，来获取新的消息。
 Push方式里，consumer把轮询过程封装了，并注册MessageListener监听器，取到消息后，唤醒MessageListener的consumeMessage()来消费，对用户而言，感觉消息是被推送过来的。
 
 Pull方式里，取消息的过程需要用户自己写，首先通过打算消费的Topic拿到MessageQueue的集合，遍历MessageQueue集合，然后针对每个MessageQueue批量取消息，一次取完后，记录该队列下一次要取的开始offset，直到取完了，再换另一个MessageQueue。
+
+#### 拉取消息demo
+```java
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.rocketmq.client.consumer.DefaultMQPullConsumer;
+import org.apache.rocketmq.client.consumer.PullResult;
+import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.common.message.MessageQueue;
+
+public class PullConsumer {
+    // 记录每个队列的消费进度
+    private static final Map<MessageQueue, Long> OFFSE_TABLE = new HashMap<MessageQueue, Long>();
+
+    public static void main(String[] args) throws MQClientException {
+        // 1. 创建DefaultMQPullConsumer实例
+        DefaultMQPullConsumer consumer = new DefaultMQPullConsumer("please_rename_unique_group_name_5");
+        // 2. 设置NameServer
+        consumer.setNamesrvAddr("127.0.0.1:9876");
+        consumer.start();
+
+        // 3. 获取Topic的所有队列
+        Set<MessageQueue> mqs = consumer.fetchSubscribeMessageQueues("TopicTest");
+
+        // 4. 遍历所有队列
+        for (MessageQueue mq : mqs) {
+            System.out.printf("Consume from the queue: %s%n", mq);
+            SINGLE_MQ:
+            while (true) {
+                try {
+                    // 5. 拉取消息，arg1=消息队列，arg2=tag消息过滤，arg3=消息队列，arg4=一次最大拉去消息数量
+                    PullResult pullResult =
+                            consumer.pullBlockIfNotFound(mq, null, getMessageQueueOffset(mq), 32);
+                    System.out.printf("%s%n", pullResult);
+                    // 6. 将消息放入hash表中，存储该队列的消费进度
+                    putMessageQueueOffset(mq, pullResult.getNextBeginOffset());
+                    switch (pullResult.getPullStatus()) {
+                        case FOUND:  // 找到消息，输出
+                            System.out.println(pullResult.getMsgFoundList().get(0));
+                            break;
+                        case NO_MATCHED_MSG:  // 没有匹配tag的消息
+                            System.out.println("无匹配消息");
+                            break;
+                        case NO_NEW_MSG:  // 该队列没有新消息，消费offset=最大offset
+                            System.out.println("没有新消息");
+                            break SINGLE_MQ;  // 跳出该队列遍历
+                        case OFFSET_ILLEGAL:  // offset不合法
+                            System.out.println("Offset不合法");
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // 7. 关闭Consumer
+        consumer.shutdown();
+    }
+
+    /**
+     * 从Hash表中获取当前队列的消费offset
+     * @param mq 消息队列
+     * @return long类型 offset
+     */
+    private static long getMessageQueueOffset(MessageQueue mq) {
+        Long offset = OFFSE_TABLE.get(mq);
+        if (offset != null)
+            return offset;
+
+        return 0;
+    }
+
+    /**
+     * 将消费进度更新到Hash表
+     * @param mq 消息队列
+     * @param offset offset
+     */
+    private static void putMessageQueueOffset(MessageQueue mq, long offset) {
+        OFFSE_TABLE.put(mq, offset);
+    }
+}
+```
+## 消费消息重试
+### 1. 顺序消息的重试
+
+对于顺序消息，当消费者消费消息失败后，消息队列 RocketMQ 会自动不断进行消息重试（每次间隔时间为 1 秒），这时，应用会出现消息消费被阻塞的情况。因此，在使用顺序消息时，务必保证应用能够及时监控并处理消费失败的情况，避免阻塞现象的发生。
+
+### 2. 无序消息的重试
+
+对于无序消息（普通、定时、延时、事务消息），当消费者消费消息失败时，您可以通过设置返回状态达到消息重试的结果。
+
+**注意：**无序消息的重试只针对**集群消费方式**生效；**广播方式不提供失败重试特性**，即消费失败后，失败消息不再重试，继续消费新的消息。
+
+#### 2.1 重试次数
+
+消息队列 RocketMQ 默认允许每条消息最多重试 16 次，每次重试的间隔时间如下：
+
+| 第几次重试 | 与上次重试的间隔时间 | 第几次重试 | 与上次重试的间隔时间 |
+| ---------- | -------------------- | ---------- | -------------------- |
+| 1          | 10 秒                | 9          | 7 分钟               |
+| 2          | 30 秒                | 10         | 8 分钟               |
+| 3          | 1 分钟               | 11         | 9 分钟               |
+| 4          | 2 分钟               | 12         | 10 分钟              |
+| 5          | 3 分钟               | 13         | 20 分钟              |
+| 6          | 4 分钟               | 14         | 30 分钟              |
+| 7          | 5 分钟               | 15         | 1 小时               |
+| 8          | 6 分钟               | 16         | 2 小时               |
+
+如果消息重试 16 次后仍然失败，消息将不再投递。如果严格按照上述重试时间间隔计算，某条消息在一直消费失败的前提下，将会在接下来的 4 小时 46 分钟之内进行 16 次重试，超过这个时间范围消息将不再重试投递。
+
+**注意：** 一条消息无论重试多少次，这些重试消息的 Message ID 不会改变。
+
